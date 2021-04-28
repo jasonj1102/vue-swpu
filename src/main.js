@@ -1,8 +1,10 @@
-import Vue from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
-
-Vue.config.productionTip = false
-
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+import router from './router'
+import store from './store'
+import './assets/css/icon.css'
+const app = createApp(App)
+app
+    .use(store)
+    .use(router)
+    .mount('#app')
