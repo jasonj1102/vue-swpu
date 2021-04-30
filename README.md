@@ -3,17 +3,16 @@
 
 ### :pencil: 前言
 >此项目是西南石油大学网信中心在线业务调配系统的前端代码，使用
-vue+element-ui模板进行构建。使用vue进行开发，需要安装node.js,安装步骤详见
-<a herf="http://nodejs.cn/">node.js官网</a>
+vue+element-ui模板进行构建。使用vue进行开发，需要安装node.js,安装步骤详见[node.js官网](http://nodejs.cn)
 
 ### 项目运行
 
 ``` bash
 # install dependencies
-npm install
+npm run build or npm run build 
 
-# serve with hot reload at localhost:8888
-npm run dev
+# serve with hot reload at localhost:8081
+npm run serve or yarn serve
 
 ```
 
