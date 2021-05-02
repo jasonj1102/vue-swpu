@@ -131,11 +131,12 @@
     }
   }
 </script>
-<style lang="less" scoped>
+<style lang='less' scoped>
   .s-canvas {
     height: 38px;
     canvas{
-      margin-top: 5px;
+      margin-top: 1px;
+      margin-left: 3px;
     }
   }
 </style>

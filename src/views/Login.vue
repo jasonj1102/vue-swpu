@@ -27,30 +27,31 @@
             <el-input
               v-model="param.verifycode"
               placeholder="请输入验证码"
-              @keyup.enter.native="login('ruleForm')"
             ></el-input>
             <span @click="refreshCode">
-              <s-identify :identifyCode="identifyCode"></s-identify>
+              <identify :identifyCode="identifyCode"></identify>
             </span>
           </div>
         </el-form-item>
         <div class="login-btn">
           <el-button type="primary" @click="submitForm()">登录</el-button>
         </div>
-        <p class="login-tips">Tips : 用户名和密码随便填。</p>
+        <p class="login-tips">Tips : 非团队成员请勿使用。</p>
       </el-form>
     </div>
   </div>
 </template>
 
 <script>
-import Identify from '../components/Identify'
+import Identify from '../components/Identify.vue'
 export default {
   components: {Identify},
   data() {
     // 验证码自定义验证规则
     const validateVerifycode = (rule, value, callback) => {
+      // 输入的验证码值
       const newVal = value.toLowerCase()
+      // 生成的验证码值
       const identifyStr = this.identifyCode.toLowerCase()
       if (newVal === '') {
         callback(new Error('请输入验证码'))
@@ -71,13 +72,13 @@ export default {
     },
       rules: {
         username: [
-            { required: true, message: "请输入用户名", trigger: "blur" }
+          { required: true, message: "请输入用户名", trigger: "blur" }
         ],
         password: [
-            { required: true, message: "请输入密码", trigger: "blur" }
+          { required: true, message: "请输入密码", trigger: "blur" }
         ],
         verifycode:[
-          { required: true, trigger: 'blur',message:"请输入验证码", validator: validateVerifycode }
+          { required: true, trigger: 'blur', validator: validateVerifycode }
         ]
       }
     };
@@ -113,15 +114,18 @@ export default {
       this.$refs.login.validate(valid => {
         // 表单验证成功，去请求后台登录/user/login接口
         if (valid) {
-          this.$axios.post('/user/login',
+          this.$axios.post('/api/user/login',
             {
               username: this.param.username,
               password: this.param.password
             }).then(res=>{
-              var resInfo = res.data.result;
-                if(res.status == 200 && resInfo.code == 200){
+              var resInfo = res.result;
+              var userInfo = res.user;
+                if(resInfo.code == 200){
                   // 将返回的用户token信息储存在localStorge
                   localStorage.setItem('token',resInfo.data);
+                  // 将返回的用户信息储存在localStorge中
+                  localStorage.setItem('user',userInfo);
                   this.$message.success(resInfo.message);
                 }else if(resInfo.code == 201){
                   this.$message.error(resInfo.message);
@@ -129,13 +133,10 @@ export default {
                   this.$message.error(resInfo.message);
                 }
               }
-            ).catch(err =>{
-              console.error(err);
-            });
-          localStorage.setItem("ms_username", this.param.username);
+            )
           this.$router.push("/");
         } else {
-          this.$message.error("请输入账号和密码");
+          this.$message.error("请重新输入验证码");
           return false;
         }
       });

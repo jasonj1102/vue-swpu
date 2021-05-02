@@ -10,21 +10,21 @@ import axios from "axios"
 // 创建axios实例，供全局使用
 const instance = axios.create({
   // 后端请求地址
-  baseURL: "localhost:8080/api",
+  // baseURL: "localhost:8080/api",
   // 请求头的格式
   header: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
   },
   timeout: 5000,
   // 表示跨域请求时是否需要使用凭证
-  withCredentials: true
+  // withCredentials: true
 })
 
 // 在请求前拦截，为请求头里加上token信息
 instance.interceptors.request.use(
   config => {
       //当请求路径不是登录的时候，加上token信息
-      if(config.url!='/user/login'){
+      if(config.url!='/api/user/login'){
           config.headers.Authorization = localStorage.getItem('token');
       }
       return config;
