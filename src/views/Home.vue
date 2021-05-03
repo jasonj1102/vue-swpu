@@ -18,8 +18,8 @@
   </div>
 </template>
 <script>
-import vHeader from "../components/Header";
-import vSidebar from "../components/Sidebar";
+import vHeader from "../components/Header.vue";
+import vSidebar from "../components/Sidebar.vue";
 import vTags from "../components/Tags.vue";
 export default {
   components: {

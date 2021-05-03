@@ -18,7 +18,7 @@ const routes = [
               path: "/dashboard",
               name: "dashboard",
               meta: {
-                  title: '系统首页'
+                  title: '系统首页',
               },
               component: () => import (
               /* webpackChunkName: "dashboard" */
@@ -45,11 +45,17 @@ const router = createRouter({
 
 // 判断是否为登录状态，没有登录默认跳转至/login路径下
 router.beforeEach((to, from, next) => {
-    document.title = `${to.meta.title} | vue-manage-system`;
-    const role = localStorage.getItem('ms_username');
-    if (!role && to.path !== '/login') {
-        next('/login');
-    } else if (to.meta.permission) {
+    document.title = `${to.meta.title} | vue-swpu`;
+    const token = localStorage.getItem('token');
+    // 要进入的路由不是/login且token为null,跳转至登录界面
+    if (to.path !== '/login' && !token){
+        next('/login')
+    }
+    else{
+        next()
+    }
+    /**
+     * else if (to.meta.permission) {
         // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
         role === 'admin'
             ? next()
@@ -57,6 +63,8 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
+     */
+    
 });
 
 export default router;

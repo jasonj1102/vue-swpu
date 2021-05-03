@@ -44,6 +44,7 @@
 
 <script>
 import Identify from '../components/Identify.vue'
+import {mapActions} from 'vuex'
 export default {
   components: {Identify},
   data() {
@@ -61,7 +62,7 @@ export default {
       } else {
         callback()
       }
-  }
+    }
   return {
     identifyCodes: '123456789ABCDEFGHGKMNPQRSTUVWXY',
     identifyCode: '',
@@ -92,6 +93,8 @@ export default {
     this.makeCode(this.identifyCodes, 4)
   },
   methods: {
+    // 引入user命名空间下的方法,将信息交由vuex进行状态管理
+    ...mapActions('user',['setToken','setUserInfo']),
     // 生成随机数
     randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min)
@@ -112,28 +115,26 @@ export default {
     submitForm(){
       // 执行表单验证
       this.$refs.login.validate(valid => {
-        // 表单验证成功，去请求后台登录/user/login接口
+        // 表单验证成功，去请求后台登录/api/user/login接口
         if (valid) {
-          this.$axios.post('/api/user/login',
-            {
-              username: this.param.username,
-              password: this.param.password
-            }).then(res=>{
-              var resInfo = res.result;
-              var userInfo = res.user;
-                if(resInfo.code == 200){
-                  // 将返回的用户token信息储存在localStorge
-                  localStorage.setItem('token',resInfo.data);
-                  // 将返回的用户信息储存在localStorge中
-                  localStorage.setItem('user',userInfo);
-                  this.$message.success(resInfo.message);
-                }else if(resInfo.code == 201){
-                  this.$message.error(resInfo.message);
-                }else{
-                  this.$message.error(resInfo.message);
-                }
-              }
-            )
+          let user ={
+            username: this.param.username,
+            password: this.param.password
+          }
+          const result = this.$api.user.login(user)
+          // 获取token
+          const token = result.data.token
+          this.setToken(token)
+          // 获取用户信息
+          const userInfo = result.data.user
+          this.setUserInfo(userInfo)
+          if(result.code ===200){
+            this.$message.success(result.message);
+          }else if(result.code ===201){
+            this.$message.error(result.message);
+          }else if(result.code ===401){
+            this.$message.error(result.message);
+          }
           this.$router.push("/");
         } else {
           this.$message.error("请重新输入验证码");

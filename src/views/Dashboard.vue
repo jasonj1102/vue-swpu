@@ -123,7 +123,7 @@ export default {
     name: "dashboard",
     data() {
         return {
-            name: localStorage.getItem("ms_username"),
+            name: localStorage.getItem("username"),
             todoList: [
                 {
                     title: "今天要修复100个bug",
@@ -230,7 +230,6 @@ export default {
     },
     computed: {
         role() {
-            return this.name === "admin" ? "超级管理员" : "普通用户";
         }
     },
 
@@ -309,6 +308,10 @@ export default {
     padding-bottom: 20px;
     border-bottom: 2px solid #ccc;
     margin-bottom: 20px;
+}
+
+.user-info-name{
+    margin-bottom: 10px;
 }
 
 .user-avator {
