@@ -23,17 +23,17 @@
         </div>
         <!-- 用户头像 -->
         <div class="user-avator">
-          <img src="../assets/img/img.jpg" />
+          <img src="../assets/img/wxzx.jpg" />
         </div>
         <!-- 用户名下拉菜单 -->
         <el-dropdown class="user-name" trigger="click" @command="handleCommand">
           <span class="el-dropdown-link">
-            {{username}}
+            {{userInfo.username}}
             <i class="el-icon-caret-bottom"></i>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
+              <a href="https://github.com/jasonj1102/vue-swpu.git" target="_blank">
                 <el-dropdown-item>项目仓库</el-dropdown-item>
               </a>
               <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
@@ -45,6 +45,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex';
 export default {
   data() {
     return {
@@ -54,10 +55,7 @@ export default {
     };
   },
   computed: {
-    username() {
-      let username = localStorage.getItem("ms_username");
-      return username ? username : this.name;
-    },
+    ...mapState('user',['userInfo']),
     collapse() {
       return this.$store.state.collapse;
     }
@@ -143,6 +141,7 @@ export default {
 }
 .user-avator {
   margin-left: 20px;
+  margin-right: 10px;
 }
 .user-avator img {
   display: block;

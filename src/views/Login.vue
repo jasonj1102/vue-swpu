@@ -2,7 +2,13 @@
   <div class="login-wrap">
     <div class="ms-login">
       <div class="ms-title">网信中心在线业务调配系统</div>
-      <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
+      <el-form
+        :model="param"
+        :rules="rules"
+        ref="login"
+        label-width="0px"
+        class="ms-content"
+      >
         <el-form-item prop="username">
           <el-input v-model="param.username" placeholder="username">
             <template #prepend>
@@ -23,7 +29,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="verifycode">
-          <div style="display:flex">
+          <div style="display: flex">
             <el-input
               v-model="param.verifycode"
               placeholder="请输入验证码"
@@ -43,45 +49,45 @@
 </template>
 
 <script>
-import Identify from '../components/Identify.vue'
-import {mapActions} from 'vuex'
+import Identify from "../components/Identify.vue";
+import { mapActions } from "vuex";
+
+
 export default {
-  components: {Identify},
+  components: { Identify },
   data() {
     // 验证码自定义验证规则
-    const validateVerifycode = (rule, value, callback) => {
-      // 输入的验证码值
-      const newVal = value.toLowerCase()
-      // 生成的验证码值
-      const identifyStr = this.identifyCode.toLowerCase()
-      if (newVal === '') {
-        callback(new Error('请输入验证码'))
-      } else if (newVal !== identifyStr) {
-        console.log('validateVerifycode:', value)
-        callback(new Error('验证码不正确!'))
-      } else {
-        callback()
-      }
-    }
-  return {
-    identifyCodes: '123456789ABCDEFGHGKMNPQRSTUVWXY',
-    identifyCode: '',
-    param: {
-      username: '',
-      password: '',
-      verifycode: ''
-    },
+    // const validateVerifycode = (rule, value, callback) => {
+    //   // 输入的验证码值
+    //   const newVal = value.toLowerCase();
+    //   // 生成的验证码值
+    //   const identifyStr = this.identifyCode.toLowerCase();
+    //   if (newVal === "") {
+    //     callback(new Error("请输入验证码"));
+    //   } else if (newVal !== identifyStr) {
+    //     console.log("validateVerifycode:", value);
+    //     callback(new Error("验证码不正确!"));
+    //   } else {
+    //     callback();
+    //   }
+    // };
+    return {
+      identifyCodes: "123456789ABCDEFGHGKMNPQRSTUVWXY",
+      identifyCode: "",
+      param: {
+        username: "",
+        password: "",
+        verifycode: "",
+      },
       rules: {
         username: [
-          { required: true, message: "请输入用户名", trigger: "blur" }
+          { required: true, message: "请输入用户名", trigger: "blur" },
         ],
-        password: [
-          { required: true, message: "请输入密码", trigger: "blur" }
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        verifycode: [
+          // { required: true, trigger: "blur", validator: validateVerifycode },
         ],
-        verifycode:[
-          { required: true, trigger: 'blur', validator: validateVerifycode }
-        ]
-      }
+      },
     };
   },
   created() {
@@ -89,51 +95,51 @@ export default {
   },
   mounted() {
     // 验证码初始化
-    this.identifyCode = ''
-    this.makeCode(this.identifyCodes, 4)
+    this.identifyCode = "";
+    this.makeCode(this.identifyCodes, 4);
   },
   methods: {
     // 引入user命名空间下的方法,将信息交由vuex进行状态管理
-    ...mapActions('user',['setToken','setUserInfo']),
+    ...mapActions("user", ["setToken", "setUserInfo"]),
     // 生成随机数
     randomNum(min, max) {
-      return Math.floor(Math.random() * (max - min) + min)
+      return Math.floor(Math.random() * (max - min) + min);
     },
     // 刷新验证码
     refreshCode() {
-      this.identifyCode = ''
-      this.makeCode(this.identifyCodes, 4)
+      this.identifyCode = "";
+      this.makeCode(this.identifyCodes, 4);
     },
     // 生成四位随机验证码
     makeCode(o, l) {
       for (let i = 0; i < l; i++) {
         this.identifyCode += this.identifyCodes[
           this.randomNum(0, this.identifyCodes.length)
-        ]
+        ];
       }
     },
-    submitForm(){
+    submitForm() {
       // 执行表单验证
-      this.$refs.login.validate(valid => {
+      this.$refs.login.validate(async (valid) => {
         // 表单验证成功，去请求后台登录/api/user/login接口
         if (valid) {
-          let user ={
+          let user = {
             username: this.param.username,
-            password: this.param.password
-          }
-          const result = this.$api.user.login(user)
+            password: this.param.password,
+          };
+          const {code,message,data} = await this.$api.user.login(user);
           // 获取token
-          const token = result.data.token
-          this.setToken(token)
+          const token = data.token;
+          this.setToken(token);
           // 获取用户信息
-          const userInfo = result.data.user
-          this.setUserInfo(userInfo)
-          if(result.code ===200){
-            this.$message.success(result.message);
-          }else if(result.code ===201){
-            this.$message.error(result.message);
-          }else if(result.code ===401){
-            this.$message.error(result.message);
+          const userInfo = data.user;
+          this.setUserInfo(userInfo);
+          if (code === 200) {
+            this.$message.success(message);
+          } else if (code === 201) {
+            this.$message.error(message);
+          } else if (code === 401) {
+            this.$message.error(message);
           }
           this.$router.push("/");
         } else {
@@ -141,8 +147,8 @@ export default {
           return false;
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

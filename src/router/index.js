@@ -23,7 +23,16 @@ const routes = [
               component: () => import (
               /* webpackChunkName: "dashboard" */
               "../views/Dashboard.vue")
-          }
+          },
+            {
+                path: "/number",
+                name: "number",
+                meta: {
+                    title: '电话管理',
+                },
+                component: () => import(
+                "../views/Number.vue")
+            }
         ]
     }, {
         path: "/login",

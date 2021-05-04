@@ -1,15 +1,16 @@
 // 用户信息
 const state = {
   token: localStorage.getItem('token'),
-  user:{
-    uId:1,
+  userInfo:{
+    uid:1,
     username:'',
     role:{
-      rId:1,
+      rid:1,
       roleName:'',
       permissions:[
         {
-          pId:1,
+          pid:1,
+          index:'',
           permissionName:''
         }
       ]
@@ -23,7 +24,7 @@ const mutations = {
     localStorage.setItem('token',payload)
   },
   setUserInfo(state,payload){
-    state.user = payload
+    state.userInfo = payload
   }
 }
 
@@ -38,7 +39,7 @@ const actions = {
 }
 
 export default{
-  namespace:true,
+  namespaced:true,
   state,
   mutations,
   actions

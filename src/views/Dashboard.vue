@@ -4,9 +4,9 @@
             <el-col :span="8">
                 <el-card shadow="hover" class="mgb20" style="height:252px;">
                     <div class="user-info">
-                        <img src="../assets/img/img.jpg" class="user-avator" alt />
+                        <img src="../assets/img/wxzx.jpg" class="user-avator" alt />
                         <div class="user-info-cont">
-                            <div class="user-info-name">{{ name }}</div>
+                            <div class="user-info-name">{{ userInfo.username }}</div>
                             <div>{{ role }}</div>
                         </div>
                     </div>
@@ -119,11 +119,11 @@
 
 <script>
 import Schart from "vue-schart";
+import {mapState} from 'vuex'
+
 export default {
-    name: "dashboard",
     data() {
         return {
-            name: localStorage.getItem("username"),
             todoList: [
                 {
                     title: "今天要修复100个bug",
@@ -228,11 +228,19 @@ export default {
     components: {
         Schart
     },
-    computed: {
-        role() {
+    computed:{
+        ...mapState('user',['userInfo']),
+        role(){
+            let realName =  this.userInfo.role.roleName
+            if(realName === 'user'){
+                return '普通用户'
+            }else if(realName === 'groupleader'){
+                return '组长'
+            }else{
+                return '超级管理员'
+            }
         }
     },
-
     methods: {
         changeDate() {
             const now = new Date().getTime();

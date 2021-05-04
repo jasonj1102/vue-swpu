@@ -8577,6 +8577,11 @@ vue-cropperjs@^5.0.0:
   dependencies:
     cropperjs "^1.5.6"
 
+vue-devtools@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.npm.taobao.org/vue-devtools/download/vue-devtools-5.1.4.tgz#265a7458ade2affb291739176964256b597fa302"
+  integrity sha1-Jlp0WK3ir/spFzkXaWQla1l/owI=
+
 vue-eslint-parser@^7.0.0:
   version "7.6.0"
   resolved "https://registry.nlark.com/vue-eslint-parser/download/vue-eslint-parser-7.6.0.tgz#01ea1a2932f581ff244336565d712801f8f72561"

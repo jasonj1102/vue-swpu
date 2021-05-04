@@ -20,6 +20,19 @@ function register(user){
   })
 }
 
+/**
+ *
+ * @param uId
+ * @param password
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+// function updatePassword(uId,password){
+//   return http.post('/api/user/updatePassword',{
+//     uId : uId,
+//     password: password
+//   })
+// }
+
 export default{
   login,
   register
