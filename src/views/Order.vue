@@ -3,7 +3,7 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-lx-cascades"></i> 电话信息
+          <i class="el-icon-lx-cascades"></i> 派单信息
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -13,18 +13,20 @@
             type="primary"
             icon="el-icon-delete"
             class="handle-del mr10"
-            @click="delAllNumber"
+            @click="delAllOrder"
         >批量删除</el-button>
         <el-button  type="primary" @click="toggleSelection()">取消选择</el-button>
-        <el-select v-model="query.address" placeholder="地址" class="handle-select mr10">
+        <el-select v-model="query.address" placeholder="派单地址" class="handle-select mr10">
           <el-option key="1" label="明理楼" value="明理楼"></el-option>
-          <el-option key="2" label="学生公寓" value="学生公寓"></el-option>
+          <el-option key="2" label="思学楼" value="思学楼"></el-option>
+          <el-option key="3" label="博学楼" value="博学楼"></el-option>
+          <el-option key="4" label="学生公寓" value="学生公寓"></el-option>
         </el-select>
-        <el-input v-model="query.stuName" placeholder="学生姓名" class="handle-input mr10"></el-input>
+        <el-input v-model="query.stuName" placeholder="派单人" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <div class="handle-right">
-        <el-button type="primary" icon="el-icon-circle-plus" @click="handleAdd">添加</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="handleAdd">派单</el-button>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
       </div>
       <el-table
@@ -36,11 +38,21 @@
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="consultant" label="咨询人" align="center"></el-table-column>
-        <el-table-column prop="number" label="电话号码" align="center"></el-table-column>
-        <el-table-column prop="stuName" label="接电话人" align="center"></el-table-column>
-        <el-table-column prop="time" label="接电话时间" align="center"></el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column prop="category" label="故障类型" align="center" width="100px"></el-table-column>
+        <el-table-column prop="address" label="用户住址" align="center" width="130px"></el-table-column>
+        <el-table-column prop="number" label="联系方式" align="center" width="160px"></el-table-column>
+        <el-table-column prop="sendTime" label="派单时间" align="center" width="160px"></el-table-column>
+        <el-table-column prop="dispatcher" label="派单人" align="center" width="150px"></el-table-column>
+        <el-table-column prop="appointmentTime" label="预约时间" align="center" width="160px"></el-table-column>
+        <el-table-column prop="description" label="故障描述" align="center" width="450px" show-overflow-tooltip="true"></el-table-column>
+        <el-table-column type="index" prop="status" label="状态" align="center" width="100px">
+          <template #default="scope">
+            <el-tag
+                :type="(scope.row.status === 1 ? 'success': (scope.row.status === 0 ? 'danger': ''))"
+            >{{ scope.row.status === 0 ? '处理中':'已完成' }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150" align="center">
           <template #default="scope">
             <el-button
                 type="text"
@@ -69,16 +81,27 @@
     </div>
 
     <!-- 添加弹出框 -->
-    <el-dialog title="添加电话信息" v-model="addVisible" width="30%" @close="addFormClosed">
+    <el-dialog title="添加派单信息" v-model="addVisible" width="30%" @close="addFormClosed">
       <el-form ref="addForm" :model="addForm" label-width="70px">
-        <el-form-item label="咨询人" prop="consultant">
-          <el-input v-model="addForm.consultant"></el-input>
+        <el-form-item label="故障类型" prop="category">
+          <el-input v-model="addForm.category"></el-input>
         </el-form-item>
-        <el-form-item label="电话号码" prop="number">
+        <el-form-item label="用户住址" prop="address">
+          <el-input v-model="addForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="联系方式" prop="number">
           <el-input v-model="addForm.number"></el-input>
         </el-form-item>
-        <el-form-item label="接电话人" prop="stuName">
-          <el-select v-model="addForm.stuName" placeholder="请选择">
+        <el-form-item label="派单时间" prop="sendTime">
+          <el-date-picker
+              v-model="addForm.sendTime"
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="选择日期时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="派单人" prop="dispatcher">
+          <el-select v-model="addForm.dispatcher" placeholder="请选择">
             <el-option
                 v-for="item in stu"
                 :key="item.sId"
@@ -87,13 +110,16 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间" prop="time">
+        <el-form-item label="预约时间" prop="appointmentTime">
           <el-date-picker
-              v-model="addForm.time"
+              v-model="addForm.appointmentTime"
               type="datetime"
               value-format="yyyy-MM-dd HH:mm:ss"
               placeholder="选择日期时间">
           </el-date-picker>
+        </el-form-item>
+        <el-form-item label="故障描述" prop="description">
+          <el-input v-model="addForm.description"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -106,16 +132,27 @@
 
 
     <!-- 编辑弹出框 -->
-    <el-dialog title="编辑电话信息" v-model="editVisible" width="30%">
+    <el-dialog title="编辑派单信息" v-model="editVisible" width="30%">
       <el-form ref="form" :model="form" label-width="70px">
-        <el-form-item label="咨询人">
-          <el-input v-model="form.consultant"></el-input>
+        <el-form-item label="故障类型" prop="category">
+          <el-input v-model="form.category"></el-input>
         </el-form-item>
-        <el-form-item label="电话号码">
+        <el-form-item label="用户住址" prop="address">
+          <el-input v-model="form.address"></el-input>
+        </el-form-item>
+        <el-form-item label="联系方式" prop="number">
           <el-input v-model="form.number"></el-input>
         </el-form-item>
-        <el-form-item label="接电话人">
-          <el-select v-model="form.stuName" placeholder="请选择">
+        <el-form-item label="派单时间" prop="sendTime">
+          <el-date-picker
+              v-model="form.sendTime"
+              type="datetime"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              placeholder="选择日期时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="派单人" prop="dispatcher">
+          <el-select v-model="form.dispatcher" placeholder="请选择">
             <el-option
                 v-for="item in stu"
                 :key="item.sId"
@@ -124,13 +161,19 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间">
+        <el-form-item label="预约时间" prop="appointmentTime">
           <el-date-picker
-              v-model="form.time"
+              v-model="form.appointmentTime"
               type="datetime"
               value-format="yyyy-MM-dd HH:mm:ss"
               placeholder="选择日期时间">
           </el-date-picker>
+        </el-form-item>
+        <el-form-item label="故障描述" prop="description">
+          <el-input v-model="form.description"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-input v-model="form.status"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -146,7 +189,7 @@
 <script>
 import {mapState,mapMutations,mapActions} from 'vuex'
 export default {
-  name: "number",
+  name: "order",
   data() {
     return {
       query: {
@@ -156,7 +199,10 @@ export default {
         pageSize:10
       },
       addForm:{},
-      form:{},
+      form:{
+        sendTime: '',
+        appointmentTime: ''
+      },
       multipleSelection: [],
       editVisible: false,
       addVisible:false,
@@ -165,42 +211,55 @@ export default {
     }
   },
   computed:{
-    ...mapState('number',['numberInfo']),
     ...mapState('stu',['student']),
-    tableData(){
-      return this.numberInfo.list
-    },
-    total(){
-      return this.numberInfo.total
-    },
+    ...mapState('order',['orderInfo']),
+    // status(){
+    //   let s = this.tableData[this].status
+    //   console.log(s)
+    //   if(s === 1){
+    //     return '已完成'
+    //   }else if (s === 0){
+    //     return '处理中'
+    //   }else {
+    //     return ''
+    //   }
+    // },
     stu(){
       return this.student
+    },
+    tableData(){
+      return this.orderInfo.list
+    },
+    total(){
+      return this.orderInfo.total
     }
   },
   created() {
     this.loadData()
   },
   methods: {
-    ...mapMutations('number',['setNumberInfo']),
-    ...mapActions('number',['getAllNumberInfo']),
+    ...mapMutations('order',['setOrderInfo']),
+    ...mapActions('order',['getAllOrderInfo']),
     // 这里获取的学生信息不是分页获取来的
     ...mapActions('stu',['getStudent']),
+    // 加载数据
     async loadData () {
-      const{code,message,data} = await this.$api.number.getAllNumber(this.query.pageIndex,this.query.pageSize)
+      const{code,message,data} = await this.$api.order.getAllOrder(this.query.pageIndex,this.query.pageSize)
       this.getStudent()
       console.log(data)
+      this.setOrderInfo(data)
+      console.log(data)
       if (code === 200){
-        this.setNumberInfo(data)
         this.$message.success(message)
       }else if(code === 201){
         this.$message.error(message)
       }
     },
     //加载全部
-     handleLoad(){
+    handleLoad(){
       this.query.address = '',
           this.query.stuName = '',
-      this.getAllNumberInfo(this.query.pageIndex)
+          this.getAllOrderInfo(this.query.pageIndex)
     },
     // 触发添加按钮
     handleAdd(){
@@ -212,22 +271,26 @@ export default {
     addFormClosed(){
       this.$refs.addForm.resetFields()
     },
-    // 触发添加number的操作
+    // 触发添加order的操作
     async saveAdd(){
-      let number = {
-        consultant : this.addForm.consultant,
+      let order = {
+        category : this.addForm.category,
+        address : this.addForm.address,
         number : this.addForm.number,
-        stuName: this.addForm.stuName,
-        time: this.$moment(this.addForm.time).format('yyyy-MM-DD HH:mm:ss')
+        sendTime : this.$moment(this.addForm.sendTime).format('yyyy-MM-DD HH:mm:ss'),
+        dispatcher : this.addForm.dispatcher,
+        description : this.addForm.description,
+        appointmentTime : this.$moment(this.addForm.appointmentTime).format('YYYY-MM-DD hh:mm:ss'),
       }
-      const{code,message,data} = await this.$api.number.insertNumber(number)
+      console.log(order)
+      const{code,message,data} = await this.$api.order.insertOrder(order)
       this.addVisible = false
       this.$refs.addForm.resetFields()
       console.log(data)
       if (code === 200){
         this.$message.success(message)
-        await this.getAllNumberInfo(this.query.pageIndex)
-        console.log(this.numberInfo)
+        await this.getAllOrderInfo(this.query.pageIndex)
+        console.log(this.orderInfo)
       }else if(code === 201){
         this.$message.error(message)
       }
@@ -240,8 +303,8 @@ export default {
         address : this.query.address,
         stuName : this.query.stuName
       }
-      const {code,message,data} = await this.$api.number.searchNumber(search)
-      this.setNumberInfo(data)
+      const {code,message,data} = await this.$api.order.searchOrder(search)
+      this.setOrderInfo(data)
       if (code === 200){
         this.$message.success(message)
       }else {
@@ -250,15 +313,17 @@ export default {
     },
     // 删除操作
     handleDelete(index) {
+      console.log(index)
       // 二次确认删除
       this.$confirm("确定要删除吗？", "提示", {
         type: "warning"
       })
           .then(async () => {
-            this.$message.success("删除成功")
-            await this.$api.number.deleteNumber(this.numberInfo.list[index].nId)
+            this.$message.success("删除成功");
+            console.log(index)
+            await this.$api.order.deleteOrder(this.orderInfo.list[index].oId)
             this.tableData.splice(index, 1);
-            await this.getAllNumberInfo(this.query.pageIndex)
+            await this.getAllOrderInfo(this.query.pageIndex)
           })
           .catch(() => {});
     },
@@ -271,25 +336,26 @@ export default {
     toggleSelection() {
       this.$refs.multipleTable.clearSelection();
     },
-    // 批量删除number
-    async delAllNumber() {
+    // 批量删除order
+    async delAllOrder() {
       const length = this.multipleSelection.length;
       let str = "";
       for (let i = 0; i < length; i++) {
         if (i === length - 1) {
-          str += this.multipleSelection[i].nId
+          str += this.multipleSelection[i].oId
         } else {
-          str += this.multipleSelection[i].nId + ",";
+          str += this.multipleSelection[i].oId + ",";
         }
       }
-        const {code,message} =await this.$api.number.deleteNumberByIds(str)
-        if (code === 200){
-          this.$message.success(message);
-        }else {
-          this.$message.error(message);
-        }
-        await this.getAllNumberInfo(this.query.pageIndex)
-        this.multipleSelection = [];
+      console.log(str)
+      const {code,message} =await this.$api.order.deleteOrderByIds(str)
+      if (code === 200){
+        this.$message.success(message);
+      }else {
+        this.$message.error(message);
+      }
+      await this.getAllOrderInfo(this.query.pageIndex)
+      this.multipleSelection = [];
     },
     // 编辑操作
     handleEdit(index, row) {
@@ -299,24 +365,28 @@ export default {
     },
     cancelEdit(){
       this.editVisible = false
-      this.getAllNumberInfo(this.query.pageIndex)
+      this.getAllOrderInfo(this.query.pageIndex)
     },
     // 保存编辑,bug问题
     async saveEdit() {
       // this.$set(this.tableData, this.idx, this.form);
       this.editVisible = false
-      let number = {
-        nId : this.numberInfo.list[this.idx].nId,
-        consultant : this.form.consultant,
+      let order = {
+        oId : this.orderInfo.list[this.idx].oId,
+        category : this.form.category,
+        address : this.form.address,
         number : this.form.number,
-        stuName: this.form.stuName,
-        time: this.$moment(this.form.time).format('yyyy-MM-DD HH:mm:ss')
+        sendTime : this.$moment(this.form.sendTime).format('YYYY-MM-DD hh:mm:ss'),
+        dispatcher : this.form.dispatcher,
+        description: this.form.description,
+        appointmentTime : this.$moment(this.form.appointmentTime).format('YYYY-MM-DD hh:mm:ss'),
+        status : this.form.status
       }
-      console.log(number)
-      const {code,message} =  await this.$api.number.updateNumber(number)
+      console.log(order)
+      const {code,message} =  await this.$api.order.updateOrder(order)
       if (code === 200){
         this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-        await this.getAllNumberInfo(this.query.pageIndex)
+        await this.getAllOrderInfo(this.query.pageIndex)
       }else if(code === 201){
         this.$message.error(message)
       }
@@ -325,7 +395,7 @@ export default {
     // 分页导航
     handlePageChange(val) {
       this.query.pageIndex = val
-      this.getAllNumberInfo(this.query.pageIndex);
+      this.getAllOrderInfo(this.query.pageIndex);
     }
   }
 };

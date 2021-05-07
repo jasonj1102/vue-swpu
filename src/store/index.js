@@ -1,6 +1,9 @@
 import {createStore} from 'vuex'
 import user from './modules/user'
 import number from './modules/number'
+import order from './modules/order'
+import stu from "./modules/stu";
+import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
     state: {
@@ -49,13 +52,16 @@ export default createStore({
             }
         },
         // 侧边栏折叠
-        hadndleCollapse(state, data) {
+        handleCollapse(state, data) {
             state.collapse = data;
         }
     },
     actions: {},
     modules: {
         user,
-        number
-    }
+        number,
+        order,
+        stu
+    },
+    plugins:[createPersistedState()]
 })

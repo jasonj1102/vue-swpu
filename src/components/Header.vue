@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <!-- 折叠按钮 -->
-    <div class="collapse-btn" @click="collapseChage">
+    <div class="collapse-btn" @click="collapseChange">
       <i v-if="!collapse" class="el-icon-s-fold"></i>
       <i v-else class="el-icon-s-unfold"></i>
     </div>
@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       fullscreen: false,
-      name: "linxin",
+      name: "",
       message: 2
     };
   },
@@ -64,18 +64,18 @@ export default {
     // 用户名下拉菜单选择事件
     handleCommand(command) {
       if (command == "loginout") {
-        localStorage.removeItem("ms_username");
+        localStorage.removeItem('token');
         this.$router.push("/login");
       }
     },
     // 侧边栏折叠
-    collapseChage() {
-      this.$store.commit("hadndleCollapse", !this.collapse);
+    collapseChange() {
+      this.$store.commit("handleCollapse", !this.collapse);
     }
   },
   mounted() {
     if (document.body.clientWidth < 1500) {
-      this.collapseChage();
+      this.collapseChange();
     }
   }
 };

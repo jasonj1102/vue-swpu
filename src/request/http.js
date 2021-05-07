@@ -5,7 +5,7 @@
  * 3. 添加响应拦截器，根据服务器返回状态进行相应的结果返回
 */
 import axios from "axios"
-
+import Qs from 'qs'
 
 // 创建axios实例，供全局使用
 const instance = axios.create({
@@ -24,6 +24,9 @@ const instance = axios.create({
 instance.interceptors.request.use(
   config => {
       //当请求路径不是登录的时候，加上token信息
+      if(config.method == "post"){
+          config.data = Qs.stringify(config.data);
+      }
       if(config.url!='/api/user/login'){
           config.headers.Authorization = localStorage.getItem('token');
       }

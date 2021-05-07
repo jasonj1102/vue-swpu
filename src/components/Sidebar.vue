@@ -11,10 +11,19 @@
         unique-opened
         router
     >
+      <el-menu-item :index="query.index">
+        <i :class="query.icon"></i>
+        <template #title>
+          系统首页
+        </template>
+      </el-menu-item>
       <el-menu-item v-for="(item,idx) in items"
                   :key="idx"
                   :index="item.index">
-        <template #title>{{ item.permissionName }}</template>
+        <i :class="item.icon"></i>
+        <template #title>
+          {{ item.permissionName }}
+        </template>
       </el-menu-item>
     </el-menu>
   </div>
@@ -27,7 +36,10 @@ import {mapState} from 'vuex'
 export default {
   data() {
     return {
-
+      query:{
+        index : 'dashboard',
+        icon : 'el-icon-setting'
+      }
     };
   },
   computed: {
@@ -35,9 +47,11 @@ export default {
     items() {
       let routers = this.userInfo.role.permissions
       routers.forEach((item)=>{
-         if(item.pid===2){
+         if(item.pId===2){
            item.index='number'
-         }else if(item.pid ===3){
+           item.icon= 'el-icon-phone-outline'
+         }else if(item.pId ===3){
+           item.icon= 'el-icon-s-promotion'
            item.index = 'order'
          }
       })
@@ -49,7 +63,7 @@ export default {
     collapse() {
       return this.$store.state.collapse
     }
-  }
+  },
 };
 </script>
 

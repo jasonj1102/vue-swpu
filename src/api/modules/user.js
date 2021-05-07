@@ -20,6 +20,14 @@ function register(user){
   })
 }
 
+function getUserInfoByUsername(username){
+  return http.get(`/api/user/getUserInfo`,{
+    params: {
+      username : username
+    }
+  })
+}
+
 /**
  *
  * @param uId
@@ -35,5 +43,6 @@ function register(user){
 
 export default{
   login,
-  register
+  register,
+  getUserInfoByUsername
 }

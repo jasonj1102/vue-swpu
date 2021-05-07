@@ -34,6 +34,6 @@ export default {
       collapse() {
           return this.$store.state.collapse;
       }
-  }
+  },
 };
 </script>

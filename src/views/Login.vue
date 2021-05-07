@@ -50,7 +50,7 @@
 
 <script>
 import Identify from "../components/Identify.vue";
-import { mapActions } from "vuex";
+import {mapMutations} from "vuex";
 
 
 export default {
@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     // 引入user命名空间下的方法,将信息交由vuex进行状态管理
-    ...mapActions("user", ["setToken", "setUserInfo"]),
+    ...mapMutations('user',['setToken','setUserInfo']),
     // 生成随机数
     randomNum(min, max) {
       return Math.floor(Math.random() * (max - min) + min);
@@ -141,7 +141,7 @@ export default {
           } else if (code === 401) {
             this.$message.error(message);
           }
-          this.$router.push("/");
+          await this.$router.push("/");
         } else {
           this.$message.error("请重新输入验证码");
           return false;

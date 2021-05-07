@@ -1,3 +1,5 @@
+import api from '../../api/index'
+
 const state = {
     numberInfo:{
         pageNum: 1,
@@ -10,7 +12,7 @@ const state = {
                 stuName: '',
                 time: '',
                 number: '',
-                nid: 1
+                nId: 1
             }
         ],
         total: 1
@@ -24,8 +26,12 @@ const mutations ={
 }
 
 const actions = {
-    setNumberInfo(context,payload){
-        context.commit('setNumberInfo',payload)
+     getAllNumberInfo(context,payload){
+        api.number.
+            getAllNumber(payload,10)
+                .then(res=>{
+            context.commit('setNumberInfo',res.data)
+        })
     }
 }
 
@@ -33,5 +39,5 @@ export default {
     namespaced:true,
     state,
     mutations,
-    actions
+    actions,
 }

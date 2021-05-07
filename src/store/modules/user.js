@@ -1,16 +1,18 @@
+import api from '../../api/index'
 // 用户信息
 const state = {
   token: localStorage.getItem('token'),
   userInfo:{
-    uid:1,
+    uId:1,
     username:'',
     role:{
-      rid:1,
+      rId:1,
       roleName:'',
       permissions:[
         {
-          pid:1,
+          pId:1,
           index:'',
+          icon:'',
           permissionName:''
         }
       ]
@@ -30,11 +32,13 @@ const mutations = {
 
 // 里面的方法会调用mutation中同名的方法
 const actions = {
-  setToken(context,payload){
-    context.commit('setToken',payload)
-  },
-  setUserInfo(context,payload){
-    context.commit('setUserInfo',payload)
+  getUserInfo(context,payload){
+    console.log(payload)
+    console.log(state.userInfo.username)
+    api.user.getUserInfoByUsername(payload)
+        .then(res=>{
+          context.commit('setUserInfo',res.data)
+        })
   }
 }
 
