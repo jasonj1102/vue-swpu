@@ -3,7 +3,7 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-lx-cascades"></i> 电话信息
+          <i class="el-icon-lx-cascades"></i> 奖惩信息
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -13,14 +13,24 @@
             type="danger"
             icon="el-icon-delete"
             class="handle-del mr10"
-            @click="delAllNumber"
+            @click="delAllFine"
         >批量删除</el-button>
         <el-button  type="primary" @click="toggleSelection()" icon="el-icon-circle-close">取消全选</el-button>
-        <el-select v-model="query.address" placeholder="地址" class="handle-select mr10" clearable>
-          <el-option key="1" label="明理楼" value="明理楼"></el-option>
-          <el-option key="2" label="学生公寓" value="学生公寓"></el-option>
+        <el-select v-model="query.sId" placeholder="学生姓名" class="handle-select mr10" clearable>
+          <el-option
+              v-for="item in stu"
+              :key="item.sId"
+              :label="item.stuName"
+              :value="item.sId">
+          </el-option>
         </el-select>
-        <el-input v-model="query.stuName" placeholder="学生姓名" class="handle-input mr10"></el-input>
+        <el-date-picker
+            v-model="query.dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期" style="margin-right:10px">
+        </el-date-picker>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <div class="handle-right">
@@ -36,10 +46,10 @@
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="consultant" label="咨询人" align="center"></el-table-column>
-        <el-table-column prop="number" label="电话号码" align="center"></el-table-column>
-        <el-table-column prop="stuName" label="接电话人" align="center"></el-table-column>
-        <el-table-column prop="time" label="接电话时间" align="center"></el-table-column>
+        <el-table-column prop="sIdsName" label="学生姓名" align="center"></el-table-column>
+        <el-table-column prop="category" label="奖励or罚款" align="center"></el-table-column>
+        <el-table-column prop="money" label="金钱" align="center"></el-table-column>
+        <el-table-column prop="time" label="奖惩时间" align="center"></el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
             <el-button
@@ -69,25 +79,23 @@
     </div>
 
     <!-- 添加弹出框 -->
-    <el-dialog title="添加电话信息" v-model="addVisible" width="30%" @close="addFormClosed">
+    <el-dialog title="添加奖惩信息" v-model="addVisible" width="50%" @close="addFormClosed">
       <el-form ref="addForm" :model="addForm" label-width="70px">
-        <el-form-item label="咨询人" prop="consultant">
-          <el-input v-model="addForm.consultant"></el-input>
+    <!-- 加一个checkout多项选择器-->
+        <el-form-item label="学生姓名">
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+          <el-checkbox-group v-model="addForm.sIds" @change="handleCheckedStudent">
+            <el-checkbox v-for="item in student" :label="item.stuName" :key="item.sId">{{item.stuName}}</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="电话号码" prop="number">
-          <el-input v-model="addForm.number"></el-input>
+        <el-form-item label="奖惩类别">
+          <el-radio v-model="query.radio" label=1>奖励</el-radio>
+          <el-radio v-model="query.radio" label=0>惩罚</el-radio>
         </el-form-item>
-        <el-form-item label="接电话人" prop="stuName">
-          <el-select v-model="addForm.stuName" placeholder="请选择">
-            <el-option
-                v-for="item in stu"
-                :key="item.sId"
-                :label="item.stuName"
-                :value="item.stuName">
-            </el-option>
-          </el-select>
+        <el-form-item label="金钱">
+          <el-input v-model="addForm.money"></el-input>
         </el-form-item>
-        <el-form-item label="时间" prop="time">
+        <el-form-item label="奖惩时间" prop="time">
           <el-date-picker
               v-model="addForm.time"
               type="datetime"
@@ -108,23 +116,20 @@
     <!-- 编辑弹出框 -->
     <el-dialog title="编辑电话信息" v-model="editVisible" width="30%">
       <el-form ref="form" :model="form" label-width="70px">
-        <el-form-item label="咨询人">
-          <el-input v-model="form.consultant"></el-input>
+        <el-form-item label="学生姓名" prop="sIds">
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+          <el-checkbox-group v-model="form.sIds" @change="handleCheckedStudent">
+            <el-checkbox v-for="stu in student" :label="stu.sId" :key="stu.sId">{{stu.stuName}}</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="电话号码">
+        <el-form-item label="奖惩类别" prop="category">
+          <el-radio v-model="query.radio" label=1>奖励</el-radio>
+          <el-radio v-model="query.radio" label=0>惩罚</el-radio>
+        </el-form-item>
+        <el-form-item label="金钱" prop="money">
           <el-input v-model="form.number"></el-input>
         </el-form-item>
-        <el-form-item label="接电话人">
-          <el-select v-model="form.stuName" placeholder="请选择">
-            <el-option
-                v-for="item in stu"
-                :key="item.sId"
-                :label="item.stuName"
-                :value="item.stuName">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间">
+        <el-form-item label="奖惩时间" prop="time">
           <el-date-picker
               v-model="form.time"
               type="datetime"
@@ -146,17 +151,24 @@
 <script>
 import {mapState,mapMutations,mapActions} from 'vuex'
 export default {
-  name: "number",
+  name: "fine",
   data() {
     return {
       query: {
-        address: '',
-        stuName: '',
+        sId:null,
+        dateRange:'',
+        radio:'',
         pageIndex:1,
         pageSize:10
       },
-      addForm:{},
-      form:{},
+      checkAll:false,
+      isIndeterminate: false,
+      addForm:{
+        sIds:[]
+      },
+      form:{
+        sIds:[]
+      },
       multipleSelection: [],
       editVisible: false,
       addVisible:false,
@@ -165,13 +177,14 @@ export default {
     }
   },
   computed:{
-    ...mapState('number',['numberInfo']),
+    ...mapState('fine',['fineInfo']),
+    // 单独获取的所有学生信息
     ...mapState('stu',['student']),
     tableData(){
-      return this.numberInfo.list
+      return  this.fineInfo.list
     },
     total(){
-      return this.numberInfo.total
+      return this.fineInfo.total
     },
     stu(){
       return this.student
@@ -181,26 +194,27 @@ export default {
     this.loadData()
   },
   methods: {
-    ...mapMutations('number',['setNumberInfo']),
-    ...mapActions('number',['getAllNumberInfo']),
+    ...mapMutations('fine',['setFineInfo']),
+    ...mapActions('fine',['getAllFineInfo']),
     // 这里获取的学生信息不是分页获取来的
     ...mapActions('stu',['getStudent']),
     async loadData () {
-      const{code,message,data} = await this.$api.number.getAllNumber(this.query.pageIndex,this.query.pageSize)
       this.getStudent()
+      const{code,message,data} = await this.$api.fine.getAllFine(this.query.pageIndex,this.query.pageSize)
       console.log(data)
       if (code === 200){
-        this.setNumberInfo(data)
+        this.setFineInfo(data)
         this.$message.success(message)
       }else if(code === 201){
         this.$message.error(message)
       }
     },
     //加载全部
-     handleLoad(){
-      this.query.address = '',
-          this.query.stuName = '',
-      this.getAllNumberInfo(this.query.pageIndex)
+    handleLoad(){
+      this.query.sId = '',
+          this.query.startTime = '',
+          this.query.endTime = '',
+          this.getAllFineInfo(this.query.pageIndex)
     },
     // 触发添加按钮
     handleAdd(){
@@ -214,19 +228,19 @@ export default {
     },
     // 触发添加number的操作
     async saveAdd(){
-      let number = {
-        consultant : this.addForm.consultant,
-        number : this.addForm.number,
-        stuName: this.addForm.stuName,
+      let fine = {
+        sIds : this.addForm.sIds,
+        category : this.addForm.category,
+        money: this.addForm.money,
         time: this.$moment(this.addForm.time).format('yyyy-MM-DD HH:mm:ss')
       }
-      const{code,message,data} = await this.$api.number.insertNumber(number)
+      const{code,message,data} = await this.$api.fine.insertFine(fine)
       this.addVisible = false
       this.$refs.addForm.resetFields()
       console.log(data)
       if (code === 200){
         this.$message.success(message)
-        await this.getAllNumberInfo(this.query.pageIndex)
+        await this.getAllFineInfo(this.query.pageIndex)
         console.log(this.numberInfo)
       }else if(code === 201){
         this.$message.error(message)
@@ -237,11 +251,12 @@ export default {
       let search = {
         page : this.query.pageIndex,
         size : this.query.pageSize,
-        address : this.query.address,
-        stuName : this.query.stuName
+        sId : this.query.sId,
+        startTime: this.$moment(this.query.startTime).format('yyyy-MM-DD HH:mm:ss'),
+        endTime: this.$moment(this.query.endTime).format('yyyy-MM-DD HH:mm:ss')
       }
-      const {code,message,data} = await this.$api.number.searchNumber(search)
-      this.setNumberInfo(data)
+      const {code,message,data} = await this.$api.fine.searchFine(search)
+      this.setFineInfo(data)
       if (code === 200){
         this.$message.success(message)
       }else {
@@ -256,9 +271,9 @@ export default {
       })
           .then(async () => {
             this.$message.success("删除成功")
-            await this.$api.number.deleteNumber(this.numberInfo.list[index].nId)
+            await this.$api.fine.deleteFine(this.fineInfo.list[index].fId)
             this.tableData.splice(index, 1);
-            await this.getAllNumberInfo(this.query.pageIndex)
+            await this.getAllFineInfo(this.query.pageIndex)
           })
           .catch(() => {});
     },
@@ -272,24 +287,24 @@ export default {
       this.$refs.multipleTable.clearSelection();
     },
     // 批量删除number
-    async delAllNumber() {
+    async delAllFine() {
       const length = this.multipleSelection.length;
       let str = "";
       for (let i = 0; i < length; i++) {
         if (i === length - 1) {
-          str += this.multipleSelection[i].nId
+          str += this.multipleSelection[i].fId
         } else {
-          str += this.multipleSelection[i].nId + ",";
+          str += this.multipleSelection[i].fId + ",";
         }
       }
-        const {code,message} =await this.$api.number.deleteNumberByIds(str)
-        if (code === 200){
-          this.$message.success(message);
-        }else {
-          this.$message.error(message);
-        }
-        await this.getAllNumberInfo(this.query.pageIndex)
-        this.multipleSelection = [];
+      const {code,message} =await this.$api.fine.deleteFineByIds(str)
+      if (code === 200){
+        this.$message.success(message);
+      }else {
+        this.$message.error(message);
+      }
+      await this.getAllFineInfo(this.query.pageIndex)
+      this.multipleSelection = [];
     },
     // 编辑操作
     handleEdit(index, row) {
@@ -299,24 +314,24 @@ export default {
     },
     cancelEdit(){
       this.editVisible = false
-      this.getAllNumberInfo(this.query.pageIndex)
+      this.getAllFineInfo(this.query.pageIndex)
     },
     // 保存编辑,bug问题
     async saveEdit() {
       // this.$set(this.tableData, this.idx, this.form);
       this.editVisible = false
-      let number = {
-        nId : this.numberInfo.list[this.idx].nId,
-        consultant : this.form.consultant,
-        number : this.form.number,
-        stuName: this.form.stuName,
-        time: this.$moment(this.form.time).format('yyyy-MM-DD HH:mm:ss')
+      let fine = {
+        fId : this.fineInfo.list[this.idx].fId,
+        sIds : this.addForm.sIds,
+        category : this.addForm.category,
+        money: this.addForm.money,
+        time: this.$moment(this.addForm.time).format('yyyy-MM-DD HH:mm:ss')
       }
-      console.log(number)
-      const {code,message} =  await this.$api.number.updateNumber(number)
+      console.log(fine)
+      const {code,message} =  await this.$api.fine.updateFine(fine)
       if (code === 200){
         this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-        await this.getAllNumberInfo(this.query.pageIndex)
+        await this.getAllFineInfo(this.query.pageIndex)
       }else if(code === 201){
         this.$message.error(message)
       }
@@ -325,13 +340,34 @@ export default {
     // 分页导航
     handlePageChange(val) {
       this.query.pageIndex = val
-      this.getAllNumberInfo(this.query.pageIndex);
+      this.getAllFineInfo(this.query.pageIndex);
+    },
+    // check多选框的执行方法
+    handleCheckAllChange(val) {
+      let stuArr = new Array()
+          for(let i=0;i<this.student.length;i++){
+            stuArr[i]=this.student[i].sId
+      }
+      this.form.sIds = val ? stuArr: [];
+      this.isIndeterminate = false;
+    },
+    handleCheckedCitiesChange(value) {
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === this.student.length;
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.student.length;
     }
   }
 };
 </script>
 
+<style>
+.el-dialog__body {
+  padding:0px 10px;
+}
+</style>
+
 <style scoped>
+
 .handle-left {
   margin-bottom: 20px;
   float: left;
@@ -347,10 +383,6 @@ export default {
   margin-left: 20px;
 }
 
-.handle-input {
-  width: 300px;
-  display: inline-block;
-}
 .table {
   width: 100%;
   font-size: 14px;

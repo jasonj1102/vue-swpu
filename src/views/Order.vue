@@ -10,13 +10,13 @@
     <div class="container">
       <div class="handle-left">
         <el-button
-            type="primary"
+            type="danger"
             icon="el-icon-delete"
             class="handle-del mr10"
             @click="delAllOrder"
         >批量删除</el-button>
-        <el-button  type="primary" @click="toggleSelection()">取消选择</el-button>
-        <el-select v-model="query.address" placeholder="派单地址" class="handle-select mr10">
+        <el-button  type="primary" @click="toggleSelection()" icon="el-icon-circle-close">取消全选</el-button>
+        <el-select v-model="query.address" placeholder="派单地址" class="handle-select mr10" clearable>
           <el-option key="1" label="明理楼" value="明理楼"></el-option>
           <el-option key="2" label="思学楼" value="思学楼"></el-option>
           <el-option key="3" label="博学楼" value="博学楼"></el-option>

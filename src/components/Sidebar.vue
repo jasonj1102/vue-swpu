@@ -53,6 +53,29 @@ export default {
          }else if(item.pId ===3){
            item.icon= 'el-icon-s-promotion'
            item.index = 'order'
+         }else if(item.pId ===6){
+           item.icon= 'el-icon-user-solid'
+           item.index = 'student'
+         }else if(item.pId ===5){
+           item.icon = 'el-icon-s-tools'
+           item.index = 'tool'
+         }else if(item.pId ===4){
+           item.icon = 'el-icon-document-add'
+           item.index = 'solveOrder'
+         }else if(item.pId ===1){
+           item.icon = 'el-icon-date'
+           item.index = 'signForm'
+         }else if(item.pId === 7){
+           item.icon = 'el-icon-time'
+         }else if (item.pId ===8){
+           item.icon = 'el-icon-trophy'
+           item.index = 'fine'
+         }else if(item.pId === 9){
+           item.icon = 'el-icon-link'
+           item.index = 'workLoad'
+         }else {
+           item.icon = 'el-icon-switch-button'
+           item.index = 'admin'
          }
       })
       return routers

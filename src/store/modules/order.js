@@ -1,47 +1,47 @@
 import api from '../../api/index'
 
 const state = {
-    orderInfo:{
-        pageNum: 1,
-        pageSize: 1,
-        size: 1,
-        pages: 1,
-        list: [
-            {
-                oId:1,
-                category:'',
-                address:'',
-                number:'',
-                description:'',
-                sendTime:'',
-                dispatcher:'',
-                appointmentTime:'',
-                status:0
-            }
-        ],
-        total: 1
-    }
+  orderInfo:{
+    pageNum: 1,
+    pageSize: 1,
+    size: 1,
+    pages: 1,
+    list: [
+      {
+        oId:1,
+        category:'',
+        address:'',
+        number:'',
+        description:'',
+        sendTime:'',
+        dispatcher:'',
+        appointmentTime:'',
+        status:0
+      }
+    ],
+    total: 1
+  }
 }
 
 const mutations = {
-    setOrderInfo(state,payload){
-        state.orderInfo = payload
-    }
+  setOrderInfo(state,payload){
+    state.orderInfo = payload
+  }
 }
 
 const actions = {
-    getAllOrderInfo(context,payload){
-        api.order.
-        getAllOrder(payload,10)
-            .then(res=>{
-                context.commit('setOrderInfo',res.data)
-            })
-    }
+  getAllOrderInfo(context,payload){
+    api.order.
+    getAllOrder(payload,10)
+        .then(res=>{
+          context.commit('setOrderInfo',res.data)
+        })
+  }
 }
 
 export default {
-    namespaced:true,
-    state,
-    mutations,
-    actions
+  namespaced:true,
+  state,
+  mutations,
+  actions
 }
