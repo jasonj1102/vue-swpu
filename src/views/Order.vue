@@ -32,20 +32,21 @@
       <el-table
           :data="tableData"
           border
+          v-loading = "loading"
           class="table"
           ref="multipleTable"
           header-cell-class-name="table-header"
           @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="category" label="故障类型" align="center" width="100px"></el-table-column>
-        <el-table-column prop="address" label="用户住址" align="center" width="130px"></el-table-column>
+        <el-table-column prop="category" label="故障类型" align="center" width="150px"></el-table-column>
+        <el-table-column prop="address" label="用户住址" align="center" width="150px"></el-table-column>
         <el-table-column prop="number" label="联系方式" align="center" width="160px"></el-table-column>
-        <el-table-column prop="sendTime" label="派单时间" align="center" width="160px"></el-table-column>
+        <el-table-column prop="sendTime" label="派单时间" align="center" width="240px"></el-table-column>
         <el-table-column prop="dispatcher" label="派单人" align="center" width="150px"></el-table-column>
-        <el-table-column prop="appointmentTime" label="预约时间" align="center" width="160px"></el-table-column>
+        <el-table-column prop="appointmentTime" label="预约时间" align="center" width="240px"></el-table-column>
         <el-table-column prop="description" label="故障描述" align="center" width="450px" show-overflow-tooltip="true"></el-table-column>
-        <el-table-column type="index" prop="status" label="状态" align="center" width="100px">
+        <el-table-column type="index" prop="status" label="状态" align="center" width="120px">
           <template #default="scope">
             <el-tag
                 :type="(scope.row.status === 1 ? 'success': (scope.row.status === 0 ? 'danger': ''))"
@@ -198,6 +199,7 @@ export default {
         pageIndex:1,
         pageSize:10
       },
+      loading:true,
       addForm:{},
       form:{
         sendTime: '',
@@ -245,6 +247,7 @@ export default {
     // 加载数据
     async loadData () {
       const{code,message,data} = await this.$api.order.getAllOrder(this.query.pageIndex,this.query.pageSize)
+      this.loading = false,
       this.getStudent()
       console.log(data)
       this.setOrderInfo(data)
@@ -337,7 +340,7 @@ export default {
       this.$refs.multipleTable.clearSelection();
     },
     // 批量删除order
-    async delAllOrder() {
+    delAllOrder() {
       const length = this.multipleSelection.length;
       let str = "";
       for (let i = 0; i < length; i++) {
@@ -348,13 +351,20 @@ export default {
         }
       }
       console.log(str)
-      const {code,message} =await this.$api.order.deleteOrderByIds(str)
-      if (code === 200){
-        this.$message.success(message);
-      }else {
-        this.$message.error(message);
-      }
-      await this.getAllOrderInfo(this.query.pageIndex)
+      this.$confirm("确定要删除吗？", "提示", {
+        type: "warning"
+      })
+          .then(async () => {
+            const {code,message} =await this.$api.order.deleteOrderByIds(str)
+            if (code === 200){
+              this.$message.success(message);
+            }else {
+              this.$message.error(message);
+            }
+            await this.getAllOrderInfo(this.query.pageIndex)
+          })
+          .catch(() => {});
+
       this.multipleSelection = [];
     },
     // 编辑操作

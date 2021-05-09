@@ -14,7 +14,8 @@ function insertFine(fine){
     sIds : fine.sIds,
     category : fine.category,
     money : fine.money,
-    time : fine.time
+    time : fine.time,
+    description : fine.description
   })
 }
 
@@ -32,8 +33,8 @@ function searchFine(search){
   return http.post(`/api/fine/getAllByTime`,{
     page : search.page,
     size : search.size,
-    // sId
-    sId : search.sId,
+    // sIds
+    sIds : search.sIds,
     startTime : search.startTime,
     endTime : search.endTime
   })
@@ -46,8 +47,13 @@ function updateFine(fine){
     sIds : fine.sIds,
     category : fine.category,
     money : fine.money,
+    description : fine.description,
     time : fine.time
   })
+}
+
+function getAllStuReward(){
+  return http.get(`/api/fine/getAllStuReward`)
 }
 
 
@@ -57,5 +63,6 @@ export default {
   deleteFine,
   updateFine,
   deleteFineByIds,
-  searchFine
+  searchFine,
+  getAllStuReward
 }

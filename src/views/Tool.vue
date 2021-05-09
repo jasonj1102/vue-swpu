@@ -26,6 +26,7 @@
       <el-table
           :data="tableData"
           border
+          v-loading="loading"
           class="table"
           ref="multipleTable"
           header-cell-class-name="table-header"
@@ -121,6 +122,7 @@ export default {
         pageIndex:1,
         pageSize:10
       },
+      loading:true,
       addForm:{},
       form:{},
       multipleSelection: [],
@@ -147,6 +149,7 @@ export default {
     ...mapActions('tool',['getAllToolInfo']),
     async loadData () {
       const{code,message,data} = await this.$api.tool.getAllTool(this.query.pageIndex,this.query.pageSize)
+      this.loading = false,
       console.log(data)
       if (code === 200){
         this.setToolInfo(data)

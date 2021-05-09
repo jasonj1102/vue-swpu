@@ -30,6 +30,7 @@
       <el-table
           :data="tableData"
           border
+          v-loading="loading"
           class="table"
           ref="multipleTable"
           header-cell-class-name="table-header"
@@ -155,6 +156,7 @@ export default {
         pageIndex:1,
         pageSize:10
       },
+      loading:true,
       addForm:{},
       form:{},
       multipleSelection: [],
@@ -187,6 +189,7 @@ export default {
     ...mapActions('stu',['getStudent']),
     async loadData () {
       const{code,message,data} = await this.$api.number.getAllNumber(this.query.pageIndex,this.query.pageSize)
+      this.loading = false
       this.getStudent()
       console.log(data)
       if (code === 200){
@@ -272,7 +275,7 @@ export default {
       this.$refs.multipleTable.clearSelection();
     },
     // 批量删除number
-    async delAllNumber() {
+    delAllNumber() {
       const length = this.multipleSelection.length;
       let str = "";
       for (let i = 0; i < length; i++) {
@@ -282,13 +285,20 @@ export default {
           str += this.multipleSelection[i].nId + ",";
         }
       }
-        const {code,message} =await this.$api.number.deleteNumberByIds(str)
-        if (code === 200){
-          this.$message.success(message);
-        }else {
-          this.$message.error(message);
-        }
-        await this.getAllNumberInfo(this.query.pageIndex)
+      this.$confirm("确定要删除吗？", "提示", {
+        type: "warning"
+      })
+          .then(async () => {
+            const {code,message} =await this.$api.number.deleteNumberByIds(str)
+            if (code === 200){
+              this.$message.success(message);
+            }else {
+              this.$message.error(message);
+            }
+            await this.getAllNumberInfo(this.query.pageIndex)
+          })
+          .catch(() => {});
+
         this.multipleSelection = [];
     },
     // 编辑操作

@@ -22,6 +22,7 @@ const state = {
           }
         ],
         category:1,
+        description:'',
         money:0,
         time:''
       }

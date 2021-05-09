@@ -2,10 +2,12 @@ import {createStore} from 'vuex'
 import user from './modules/user'
 import number from './modules/number'
 import order from './modules/order'
-import stu from "./modules/stu";
+import stu from "./modules/stu"
 import student from "./modules/student"
 import tool from './modules/tool'
 import fine from './modules/fine'
+import reward from "./modules/reward"
+import solveOrder from './modules/solveOrder'
 import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
@@ -67,7 +69,9 @@ export default createStore({
     stu,
     student,
     tool,
-    fine
+    fine,
+    reward,
+    solveOrder
   },
   plugins:[createPersistedState()]
 })

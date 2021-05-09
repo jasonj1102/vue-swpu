@@ -5,6 +5,7 @@ import order from "./modules/order";
 import student from "./modules/student";
 import tool from "./modules/tool"
 import fine from "./modules/fine"
+import solveOrder from "./modules/solveOrder"
 
 export default{
   user,
@@ -12,5 +13,6 @@ export default{
   order,
   student,
   tool,
-  fine
+  fine,
+  solveOrder
 }

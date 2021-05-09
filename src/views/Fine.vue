@@ -40,6 +40,7 @@
       <el-table
           :data="tableData"
           border
+          v-loading="loading"
           class="table"
           ref="multipleTable"
           header-cell-class-name="table-header"
@@ -47,8 +48,15 @@
       >
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="sIdsName" label="学生姓名" align="center"></el-table-column>
-        <el-table-column prop="category" label="奖励or罚款" align="center"></el-table-column>
+        <el-table-column prop="category" label="奖励or罚款" align="center">
+          <template #default="scope">
+            <el-tag
+                :type="(scope.row.category === 1 ? 'success': (scope.row.category === 0 ? 'danger': ''))"
+            >{{ scope.row.category === 1 ?'奖励':'罚款'}}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="money" label="金钱" align="center"></el-table-column>
+        <el-table-column prop="description" label="奖惩详情" align="center"></el-table-column>
         <el-table-column prop="time" label="奖惩时间" align="center"></el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
@@ -67,6 +75,7 @@
         </el-table-column>
       </el-table>
       <div class="pagination">
+        <el-button type="success" plain @click="handleTotalMoney">奖惩总计>></el-button>
         <el-pagination
             background
             layout="total, prev, pager, next, jumper"
@@ -83,17 +92,21 @@
       <el-form ref="addForm" :model="addForm" label-width="70px">
     <!-- 加一个checkout多项选择器-->
         <el-form-item label="学生姓名">
-          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-          <el-checkbox-group v-model="addForm.sIds" @change="handleCheckedStudent">
-            <el-checkbox v-for="item in student" :label="item.stuName" :key="item.sId">{{item.stuName}}</el-checkbox>
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleAddCheckAllChange">全选</el-checkbox>
+          <el-checkbox-group v-model="addForm.sIds" @change="handleAddCheckedStudent">
+            <el-checkbox v-for="item in student" :label="item.sId" :key="item.sId">{{item.stuName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="奖惩类别">
-          <el-radio v-model="query.radio" label=1>奖励</el-radio>
-          <el-radio v-model="query.radio" label=0>惩罚</el-radio>
+        <!--这里使用:lable=“1”才是绑定的数字1-->
+          <el-radio v-model="query.radio" :label="1">奖励</el-radio>
+          <el-radio v-model="query.radio" :label="0">惩罚</el-radio>
         </el-form-item>
         <el-form-item label="金钱">
           <el-input v-model="addForm.money"></el-input>
+        </el-form-item>
+        <el-form-item label="奖惩详情">
+          <el-input v-model="addForm.description"></el-input>
         </el-form-item>
         <el-form-item label="奖惩时间" prop="time">
           <el-date-picker
@@ -117,17 +130,20 @@
     <el-dialog title="编辑电话信息" v-model="editVisible" width="30%">
       <el-form ref="form" :model="form" label-width="70px">
         <el-form-item label="学生姓名" prop="sIds">
-          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-          <el-checkbox-group v-model="form.sIds" @change="handleCheckedStudent">
+          <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleEditCheckAllChange">全选</el-checkbox>
+          <el-checkbox-group v-model="form.sIds" @change="handleEditCheckedStudent">
             <el-checkbox v-for="stu in student" :label="stu.sId" :key="stu.sId">{{stu.stuName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="奖惩类别" prop="category">
-          <el-radio v-model="query.radio" label=1>奖励</el-radio>
-          <el-radio v-model="query.radio" label=0>惩罚</el-radio>
+          <el-radio v-model="query.radio1" :label="1">奖励</el-radio>
+          <el-radio v-model="query.radio1" :label="0">惩罚</el-radio>
         </el-form-item>
         <el-form-item label="金钱" prop="money">
-          <el-input v-model="form.number"></el-input>
+          <el-input v-model="form.money"></el-input>
+        </el-form-item>
+        <el-form-item label="奖惩详情">
+          <el-input v-model="form.description"></el-input>
         </el-form-item>
         <el-form-item label="奖惩时间" prop="time">
           <el-date-picker
@@ -149,17 +165,18 @@
 </template>
 
 <script>
-import {mapState,mapMutations,mapActions} from 'vuex'
+import {mapActions, mapMutations, mapState} from 'vuex'
+
 export default {
   name: "fine",
   data() {
     return {
       query: {
         sId:null,
-        dateRange:'',
-        radio:'',
+        dateRange:[],
         pageIndex:1,
-        pageSize:10
+        radio1:0,
+        pageSize:10,
       },
       checkAll:false,
       isIndeterminate: false,
@@ -167,8 +184,10 @@ export default {
         sIds:[]
       },
       form:{
-        sIds:[]
+        sIds:[],
+
       },
+      loading : true,
       multipleSelection: [],
       editVisible: false,
       addVisible:false,
@@ -181,7 +200,16 @@ export default {
     // 单独获取的所有学生信息
     ...mapState('stu',['student']),
     tableData(){
-      return  this.fineInfo.list
+      let fineArr = this.fineInfo.list
+      for(let j =0;j<fineArr.length;j++){
+        let str = ""
+        let stuArr = fineArr[j].students
+        for (let i = 0; i<stuArr.length;i++){
+          str += (i === stuArr.length-1?stuArr[i].stuName:stuArr[i].stuName+' ')
+        }
+        fineArr[j].sIdsName = str
+      }
+      return fineArr
     },
     total(){
       return this.fineInfo.total
@@ -201,6 +229,7 @@ export default {
     async loadData () {
       this.getStudent()
       const{code,message,data} = await this.$api.fine.getAllFine(this.query.pageIndex,this.query.pageSize)
+      this.loading = false
       console.log(data)
       if (code === 200){
         this.setFineInfo(data)
@@ -212,8 +241,7 @@ export default {
     //加载全部
     handleLoad(){
       this.query.sId = '',
-          this.query.startTime = '',
-          this.query.endTime = '',
+          this.query.dateRange=[],
           this.getAllFineInfo(this.query.pageIndex)
     },
     // 触发添加按钮
@@ -228,20 +256,26 @@ export default {
     },
     // 触发添加number的操作
     async saveAdd(){
+      // 将学生id,以逗号分割，绑定至string里面
+      let stuArr = this.addForm.sIds
+      let str = ""
+      for(let i =0;i<stuArr.length;i++){
+        str += (i === stuArr.length-1 ? stuArr[i] : stuArr[i]+",")
+      }
       let fine = {
-        sIds : this.addForm.sIds,
-        category : this.addForm.category,
+        sIds : str,
+        category : this.query.radio,
         money: this.addForm.money,
+        description : this.addForm.description,
         time: this.$moment(this.addForm.time).format('yyyy-MM-DD HH:mm:ss')
       }
-      const{code,message,data} = await this.$api.fine.insertFine(fine)
+      console.log(fine)
+      const{code,message} = await this.$api.fine.insertFine(fine)
       this.addVisible = false
-      this.$refs.addForm.resetFields()
-      console.log(data)
       if (code === 200){
         this.$message.success(message)
         await this.getAllFineInfo(this.query.pageIndex)
-        console.log(this.numberInfo)
+        console.log(this.fineInfo)
       }else if(code === 201){
         this.$message.error(message)
       }
@@ -251,9 +285,11 @@ export default {
       let search = {
         page : this.query.pageIndex,
         size : this.query.pageSize,
-        sId : this.query.sId,
-        startTime: this.$moment(this.query.startTime).format('yyyy-MM-DD HH:mm:ss'),
-        endTime: this.$moment(this.query.endTime).format('yyyy-MM-DD HH:mm:ss')
+        sIds : this.query.sId,
+        // 这里的时间如果选，date-picker默认会选择电脑当前时间，这个问题不知道咋解决，就只能在后端判断如果两个时间相同，查询时就不带上改参数
+        // 有大佬知道如何让其不填充电脑当前时间的吗？求解
+        startTime: this.$moment(this.query.dateRange[0]).format('yyyy-MM-DD HH:mm:ss'),
+        endTime: this.$moment(this.query.dateRange[1]).format('yyyy-MM-DD HH:mm:ss')
       }
       const {code,message,data} = await this.$api.fine.searchFine(search)
       this.setFineInfo(data)
@@ -286,8 +322,9 @@ export default {
     toggleSelection() {
       this.$refs.multipleTable.clearSelection();
     },
-    // 批量删除number
-    async delAllFine() {
+    // 批量删除fine
+    delAllFine() {
+      // 二次确认删除
       const length = this.multipleSelection.length;
       let str = "";
       for (let i = 0; i < length; i++) {
@@ -297,19 +334,34 @@ export default {
           str += this.multipleSelection[i].fId + ",";
         }
       }
-      const {code,message} =await this.$api.fine.deleteFineByIds(str)
-      if (code === 200){
-        this.$message.success(message);
-      }else {
-        this.$message.error(message);
-      }
-      await this.getAllFineInfo(this.query.pageIndex)
+      this.$confirm("确定要删除吗？", "提示", {
+        type: "warning"
+      })
+          .then(async () => {
+            this.$message.success("删除成功")
+            const {code,message} =await this.$api.fine.deleteFineByIds(str)
+            if (code === 200){
+              this.$message.success(message);
+            }else {
+              this.$message.error(message);
+            }
+            await this.getAllFineInfo(this.query.pageIndex)
+          })
+          .catch(() => {});
       this.multipleSelection = [];
     },
     // 编辑操作
     handleEdit(index, row) {
+      let formArr = row
       this.idx = index;
-      this.form = row;
+      //这是字符串
+      let sId = formArr.sIds.split(',')
+      for (let i = 0;i<sId.length;i++){
+        sId[i] = parseInt(sId[i])
+      }
+      formArr.sIds = sId
+      this.query.radio1 = formArr.category
+      this.form = formArr
       this.editVisible = true;
     },
     cancelEdit(){
@@ -319,13 +371,20 @@ export default {
     // 保存编辑,bug问题
     async saveEdit() {
       // this.$set(this.tableData, this.idx, this.form);
+      // 将学生id,以逗号分割，绑定至string里面
+      let stuArr = this.form.sIds
+      let str = ""
+      for(let i =0;i<stuArr.length;i++){
+        str += (i === stuArr.length-1 ? stuArr[i] : stuArr[i]+",")
+      }
       this.editVisible = false
       let fine = {
         fId : this.fineInfo.list[this.idx].fId,
-        sIds : this.addForm.sIds,
-        category : this.addForm.category,
-        money: this.addForm.money,
-        time: this.$moment(this.addForm.time).format('yyyy-MM-DD HH:mm:ss')
+        sIds : str,
+        category :  this.query.radio1,
+        money: this.form.money,
+        description: this.form.description,
+        time: this.$moment(this.form.time).format('yyyy-MM-DD HH:mm:ss')
       }
       console.log(fine)
       const {code,message} =  await this.$api.fine.updateFine(fine)
@@ -342,19 +401,37 @@ export default {
       this.query.pageIndex = val
       this.getAllFineInfo(this.query.pageIndex);
     },
-    // check多选框的执行方法
-    handleCheckAllChange(val) {
-      let stuArr = new Array()
-          for(let i=0;i<this.student.length;i++){
-            stuArr[i]=this.student[i].sId
+    // check多选框的执行方法,全选CheckBox触发的方法,val==ture表示全选按钮被选中
+    handleAddCheckAllChange(val) {
+      let stuArr = []
+      for(let i=0;i<this.student.length;i++){
+        stuArr.push(this.student[i].sId)
       }
-      this.form.sIds = val ? stuArr: [];
+      this.addForm.sIds = val ? stuArr:[]
       this.isIndeterminate = false;
     },
-    handleCheckedCitiesChange(value) {
+    handleAddCheckedStudent(value) {
       let checkedCount = value.length;
       this.checkAll = checkedCount === this.student.length;
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.student.length;
+      this.addForm.sIds = value
+    },
+    handleEditCheckAllChange(val) {
+      let stuArr = []
+      for(let i=0;i<this.student.length;i++){
+        stuArr.push(this.student[i].sId)
+      }
+      this.form.sIds = val ? stuArr:[]
+      this.isIndeterminate = false;
+    },
+    handleEditCheckedStudent(value) {
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === this.student.length;
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.student.length;
+      this.form.sIds = value
+    },
+    handleTotalMoney(){
+      this.$router.push({path:'/reward'})
     }
   }
 };
@@ -363,6 +440,12 @@ export default {
 <style>
 .el-dialog__body {
   padding:0px 10px;
+}
+.el-pagination{
+  padding: 15px 5px;
+}
+.pagination{
+  margin: 10px 0px;
 }
 </style>
 

@@ -68,6 +68,15 @@ const routes = [
         },
         component:()=> import(
             "../views/Fine.vue")
+      },
+      {
+        path: "/reward",
+        name: "reward",
+        meta: {
+          title: '总奖惩',
+        },
+        component:()=> import(
+            "../views/Reward.vue")
       }
     ]
   }, {
