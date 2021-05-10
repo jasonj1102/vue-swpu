@@ -14,38 +14,31 @@ function deleteSolveOrder(soId){
 }
 
 //未完成
-function insertSolveOrder(solveOrder){
-  console.log(solveOrder)
-  return http.post('/api/solveOrder/insert',{
-    // category : order.category,
-    // address : order.address,
-    // number : order.number,
-    // sendTime : order.sendTime,
-    // dispatcher : order.dispatcher,
-    // description: order.description,
-    // appointmentTime : order.appointmentTime
-  })
-}
-// 未完成
+// function insertSolveOrder(solveOrder){
+//   console.log(solveOrder)
+//   return http.post('/api/solveOrder/insert',{
+//     // category : order.category,
+//     // address : order.address,
+//     // number : order.number,
+//     // sendTime : order.sendTime,
+//     // dispatcher : order.dispatcher,
+//     // description: order.description,
+//     // appointmentTime : order.appointmentTime
+//   })
+// }
+
 function updateSolveOrder(solveOrder){
+  console.log(solveOrder)
   return http.post(`/api/solveOrder/update`,{
-    // oId : order.oId,
-    // category : order.category,
-    // address : order.address,
-    // number : order.number,
-    // sendTime : order.sendTime,
-    // dispatcher : order.dispatcher,
-    // description : order.description,
-    // appointmentTime : order.appointmentTime,
-    // status : order.status
-  })
+    ...solveOrder
+  },{headers:{'Content-Type': 'application/json'}})
 }
 
 function searchSolveOrder(search){
   return http.post(`/api/solveOrder/search`,{
     page : search.page,
     size : search.size,
-    stuName : search.stuName
+    sId : search.sId
   })
 }
 
@@ -57,7 +50,7 @@ function deleteSolveOrderByIds(soIds){
 
 export default {
   getAllSolveOrder,
-  insertSolveOrder,
+  // insertSolveOrder,
   updateSolveOrder,
   searchSolveOrder,
   deleteSolveOrder,

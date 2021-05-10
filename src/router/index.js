@@ -77,7 +77,25 @@ const routes = [
         },
         component:()=> import(
             "../views/Reward.vue")
-      }
+      },
+      {
+        path: "/solveOrder",
+        name: "solveOrder",
+        meta: {
+          title: '登单管理',
+        },
+        component:()=> import(
+            "../views/SolveOrder.vue")
+      },
+      {
+        path: "/solveOrderForm",
+        name: "solveOrderForm",
+        meta: {
+          title: '登单表单',
+        },
+        component:()=> import(
+            "../views/SolveOrderForm.vue")
+      },
     ]
   }, {
     path: "/login",

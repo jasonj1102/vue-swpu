@@ -24,9 +24,11 @@ const instance = axios.create({
 instance.interceptors.request.use(
   config => {
     //当请求路径不是登录的时候，加上token信息
-    if(config.method == "post"){
+    // 这里在请求/api/solveOrder/update是把对象格式化错误了
+    if(config.method == "post"&&(config.url!='/api/solveOrder/update'&&config.url!='/api/solveOrder/insert')){
       config.data = Qs.stringify(config.data);
     }
+    console.log(config.data)
     if(config.url!='/api/user/login'){
       config.headers.Authorization = localStorage.getItem('token');
     }

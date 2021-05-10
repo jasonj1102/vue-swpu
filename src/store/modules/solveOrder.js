@@ -13,6 +13,9 @@ const state = {
         register:'',
         solveTime:'',
         maintainer:'',
+        maintainerName:'',
+        // 解决时长
+        duration:'',
         maintainers:[
           {
             sId:1,

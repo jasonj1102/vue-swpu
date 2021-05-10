@@ -94,7 +94,7 @@
         <el-form-item label="学生姓名">
           <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleAddCheckAllChange">全选</el-checkbox>
           <el-checkbox-group v-model="addForm.sIds" @change="handleAddCheckedStudent">
-            <el-checkbox v-for="item in student" :label="item.sId" :key="item.sId">{{item.stuName}}</el-checkbox>
+            <el-checkbox v-for="item in stu" :label="item.sId" :key="item.sId">{{item.stuName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="奖惩类别">
@@ -132,7 +132,8 @@
         <el-form-item label="学生姓名" prop="sIds">
           <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleEditCheckAllChange">全选</el-checkbox>
           <el-checkbox-group v-model="form.sIds" @change="handleEditCheckedStudent">
-            <el-checkbox v-for="stu in student" :label="stu.sId" :key="stu.sId">{{stu.stuName}}</el-checkbox>
+            <!--stu-->
+            <el-checkbox v-for="s in stu" :label="s.sId" :key="s.sId">{{s.stuName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="奖惩类别" prop="category">
@@ -185,7 +186,6 @@ export default {
       },
       form:{
         sIds:[],
-
       },
       loading : true,
       multipleSelection: [],
@@ -246,6 +246,7 @@ export default {
     },
     // 触发添加按钮
     handleAdd(){
+      this.getStudent()
       this.addVisible = true
     },
     cancelAdd(){
@@ -288,6 +289,7 @@ export default {
         sIds : this.query.sId,
         // 这里的时间如果选，date-picker默认会选择电脑当前时间，这个问题不知道咋解决，就只能在后端判断如果两个时间相同，查询时就不带上改参数
         // 有大佬知道如何让其不填充电脑当前时间的吗？求解
+        // 这里不选时间，data-picker会默认以当前电脑时间创建一个new Date()类型的对象，所有会把值一并传过去
         startTime: this.$moment(this.query.dateRange[0]).format('yyyy-MM-DD HH:mm:ss'),
         endTime: this.$moment(this.query.dateRange[1]).format('yyyy-MM-DD HH:mm:ss')
       }
