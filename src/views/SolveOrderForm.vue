@@ -1,5 +1,16 @@
 <template>
-  <el-form class="addForm" ref="form" :model="form" label-position="left" label-width="80px">
+  <el-form class="addForm" ref="form" :model="form" label-position="left" label-width="120px" >
+    <el-form-item label="未处理派单详情">
+      <el-select v-model="form.oId" placeholder="请选择未完成派单">
+        <el-option
+            v-for="item in orderList"
+            :key="item.oId"
+            style="color: #8cc5ff"
+            :label='"地址:"+item.address+" 电话:"+item.number+" 派单人:"+item.dispatcher+" 派单时间:"+item.sendTime+" 预约时间:"+item.appointmentTime'
+            :value="item.oId">
+        </el-option>
+      </el-select>
+    </el-form-item>
     <el-form-item label="登记人">
       <el-input class="c1" v-model="form.register" placeholder="请输入登记人" clearable ></el-input>
     </el-form-item>
@@ -45,7 +56,7 @@
       <el-input class="c2" placeholder="解决方法" clearable v-model="form.solution"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">立即创建</el-button>
+      <el-button type="primary" @click="onSubmit">登单</el-button>
       <el-button>取消</el-button>
     </el-form-item>
   </el-form>
@@ -76,6 +87,10 @@ export default {
   },
   computed:{
     ...mapState('stu',['student']),
+    ...mapState('order',['orderInfo']),
+    orderList(){
+      return this.orderInfo.list
+    },
     stu(){
       return this.student
     }
@@ -85,11 +100,44 @@ export default {
   },
   methods: {
     ...mapActions('stu',['getStudent']),
+    ...mapActions('order',['getAllOrderInfoNotFinish',]),
     loadData(){
       this.getStudent()
+      this.getAllOrderInfoNotFinish()
     },
-    onSubmit() {
-      console.log('submit!');
+    async onSubmit() {
+      let str = ""
+      let stuArr = this.form.maintainer
+      for (let i=0;i<stuArr.length;i++){
+        if(i === stuArr.length-1){
+          str +=stuArr[i]
+        }else {
+          str +=stuArr[i]+","
+        }
+      }
+      let solveOrder = {
+        oId : this.form.oId,
+        customerName:this.form.customerName,
+        register:this.form.register,
+        solveTime:this.$moment(this.form.solveTime).format('yyyy-MM-DD HH:mm:ss'),
+        maintainer:str,
+        status:this.form.status,
+        reason:this.form.reason,
+        solution:this.form.solution,
+        material:{
+          crystalHead:this.form.material.crystalHead,
+          networkCable:this.form.material.networkCable,
+          panel:this.form.material.panel,
+          port:this.form.material.port
+        }
+      }
+      const {code,message} = await this.$api.solveOrder.insertSolveOrder(solveOrder)
+      if(code ===200){
+        this.$message.success(message)
+        await this.$router.push({path:'/solveOrder'})
+      }else {
+        this.$message.error(message)
+      }
     },
     handleEditCheckAllChange(val) {
       let stuArr = []

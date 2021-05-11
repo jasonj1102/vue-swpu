@@ -34,8 +34,7 @@ function updateOrder(order){
     sendTime : order.sendTime,
     dispatcher : order.dispatcher,
     description : order.description,
-    appointmentTime : order.appointmentTime,
-    status : order.status
+    appointmentTime : order.appointmentTime
   })
 }
 
@@ -54,10 +53,15 @@ function deleteOrderByIds(oIds){
   })
 }
 
+function getAllOrderInfoNotFinish(){
+  return http.get(`/api/order/getOrderNotFinish`)
+}
+
 export default {
   getAllOrder,
   insertOrder,
   updateOrder,
+  getAllOrderInfoNotFinish,
   searchOrder,
   deleteOrder,
   deleteOrderByIds

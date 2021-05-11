@@ -26,6 +26,9 @@ const state = {
 const mutations = {
   setOrderInfo(state,payload){
     state.orderInfo = payload
+  },
+  setOrder(state,payload){
+    state.orderInfo.list = payload
   }
 }
 
@@ -35,6 +38,12 @@ const actions = {
     getAllOrder(payload,10)
         .then(res=>{
           context.commit('setOrderInfo',res.data)
+        })
+  },
+  getAllOrderInfoNotFinish(context){
+    api.order.getAllOrderInfoNotFinish().then(
+        res=>{
+          context.commit('setOrder',res.data)
         })
   }
 }

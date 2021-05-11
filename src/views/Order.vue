@@ -173,9 +173,6 @@
         <el-form-item label="故障描述" prop="description">
           <el-input v-model="form.description"></el-input>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-input v-model="form.status"></el-input>
-        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -389,8 +386,7 @@ export default {
         sendTime : this.$moment(this.form.sendTime).format('YYYY-MM-DD hh:mm:ss'),
         dispatcher : this.form.dispatcher,
         description: this.form.description,
-        appointmentTime : this.$moment(this.form.appointmentTime).format('YYYY-MM-DD hh:mm:ss'),
-        status : this.form.status
+        appointmentTime : this.$moment(this.form.appointmentTime).format('YYYY-MM-DD hh:mm:ss')
       }
       console.log(order)
       const {code,message} =  await this.$api.order.updateOrder(order)

@@ -364,7 +364,7 @@ export default {
           .then(async () => {
             this.$message.success("删除成功");
             console.log(index)
-            await this.$api.solveOrder.deleteSolveOrder(this.orderInfo.list[index].oId)
+            await this.$api.solveOrder.deleteSolveOrder(this.solveOrderInfo.list[index].solveId)
             this.tableData.splice(index, 1);
             await this.getAllSolveOrderInfo(this.query.pageIndex)
           })

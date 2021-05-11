@@ -13,19 +13,14 @@ function deleteSolveOrder(soId){
   return http.post(`/api/solveOrder/delete/${soId}`)
 }
 
-//未完成
-// function insertSolveOrder(solveOrder){
-//   console.log(solveOrder)
-//   return http.post('/api/solveOrder/insert',{
-//     // category : order.category,
-//     // address : order.address,
-//     // number : order.number,
-//     // sendTime : order.sendTime,
-//     // dispatcher : order.dispatcher,
-//     // description: order.description,
-//     // appointmentTime : order.appointmentTime
-//   })
-// }
+function insertSolveOrder(solveOrder){
+  console.log(solveOrder)
+  return http.post('/api/solveOrder/insert',{
+    ...solveOrder
+  },{
+    headers : {'Content-Type': 'application/json'}
+  })
+}
 
 function updateSolveOrder(solveOrder){
   console.log(solveOrder)
@@ -43,14 +38,14 @@ function searchSolveOrder(search){
 }
 
 function deleteSolveOrderByIds(soIds){
-  return http.post(`/api/solveOrder/deleteOrders`,{
+  return http.post(`/api/solveOrder/deleteSolveOrders`,{
     soIds
   })
 }
 
 export default {
   getAllSolveOrder,
-  // insertSolveOrder,
+  insertSolveOrder,
   updateSolveOrder,
   searchSolveOrder,
   deleteSolveOrder,
