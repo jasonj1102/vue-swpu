@@ -6,6 +6,7 @@
  */
 import axios from "axios"
 import Qs from 'qs'
+import router from "../router";
 
 // 创建axios实例，供全局使用
 const instance = axios.create({
@@ -43,12 +44,16 @@ instance.interceptors.request.use(
 //在响应后拦截
 instance.interceptors.response.use(
   response => {
-    if (response.status === 200) {
+    if (response.status === 200&&response.data.result.code!==402) {
       console.log(response)
       console.log(response.data.result)
       return response.data.result;
     } else {
-      Promise.reject();
+      //this.$message.error(response.data.result.message)
+      window.alert("token is expired,please login again!")
+      router.replace({
+        path:'/login'
+      }).then()
     }
   },
   error => {

@@ -8,6 +8,7 @@ import tool from './modules/tool'
 import fine from './modules/fine'
 import reward from "./modules/reward"
 import solveOrder from './modules/solveOrder'
+import workLoad from "./modules/workLoad";
 import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
@@ -71,7 +72,8 @@ export default createStore({
     tool,
     fine,
     reward,
-    solveOrder
+    solveOrder,
+    workLoad
   },
   plugins:[createPersistedState()]
 })

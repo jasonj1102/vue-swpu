@@ -96,6 +96,15 @@ const routes = [
         component:()=> import(
             "../views/SolveOrderForm.vue")
       },
+      {
+        path: "/workLoad",
+        name: "workLoad",
+        meta: {
+          title: '工作量统计',
+        },
+        component:()=> import(
+            "../views/WorkLoad.vue")
+      },
     ]
   }, {
     path: "/login",

@@ -6,6 +6,7 @@ import student from "./modules/student";
 import tool from "./modules/tool"
 import fine from "./modules/fine"
 import solveOrder from "./modules/solveOrder"
+import workLoad from "./modules/workLoad";
 
 export default{
   user,
@@ -14,5 +15,6 @@ export default{
   student,
   tool,
   fine,
-  solveOrder
+  solveOrder,
+  workLoad
 }
