@@ -128,13 +128,13 @@ export default {
             password: this.param.password,
           };
           const {code,message,data} = await this.$api.user.login(user);
-          // 获取token
-          const token = data.token;
-          this.setToken(token);
-          // 获取用户信息
-          const userInfo = data.user;
-          this.setUserInfo(userInfo);
           if (code === 200) {
+            // 获取token
+            const token = data.token;
+            this.setToken(token);
+            // 获取用户信息
+            const userInfo = data.user;
+            this.setUserInfo(userInfo);
             this.$message.success(message);
           } else if (code === 201) {
             this.$message.error(message);

@@ -75,7 +75,7 @@ export default {
            item.index = 'workLoad'
          }else {
            item.icon = 'el-icon-switch-button'
-           item.index = 'admin'
+           item.index = 'system'
          }
       })
       return routers

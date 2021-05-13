@@ -20,7 +20,8 @@
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <div class="handle-right">
-        <el-button type="primary" icon="el-icon-circle-plus" @click="handleAdd">导出</el-button>
+        <el-button type="primary" icon="el-icon-circle-plus" @click="handleExport">导出</el-button>
+        <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
       </div>
       <el-table
           :data="tableData"
@@ -30,12 +31,11 @@
           ref="multipleTable"
           header-cell-class-name="table-header"
       >
-        <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="studentName" label="学生姓名" align="center" width="150px"></el-table-column>
-        <el-table-column prop="numbers" label="接电话数" align="center" width="150px"></el-table-column>
-        <el-table-column prop="telecoms" label="电信出单数" align="center" width="160px"></el-table-column>
-        <el-table-column prop="campusNetwork" label="校园网出单数" align="center" width="240px"></el-table-column>
-        <el-table-column prop="other" label="其他情况出单" align="center" width="150px"></el-table-column>
+        <el-table-column prop="studentName" label="学生姓名" align="center"></el-table-column>
+        <el-table-column prop="numbers" label="接电话数" align="center"></el-table-column>
+        <el-table-column prop="telecoms" label="电信出单数" align="center" ></el-table-column>
+        <el-table-column prop="campusNetwork" label="校园网出单数" align="center" ></el-table-column>
+        <el-table-column prop="other" label="其他情况出单" align="center" ></el-table-column>
       </el-table>
       <div class="pagination">
         <el-pagination
@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       query: {
-        dataRange: '',
+        dateRange:[],
         pageIndex:1,
         pageSize:10
       },
@@ -98,8 +98,8 @@ export default {
       let search = {
         page : this.query.pageIndex,
         size : this.query.pageSize,
-        startTime : this.$moment(this.query.dataRange[0]).format("yyyy-MM-DD HH:mm:ss"),
-        endTime : this.$moment(this.query.dataRange[1]).format("yyyy-MM-DD HH:mm:ss")
+        startTime : this.$moment(this.query.dateRange[0]).format('yyyy-MM-DD HH:mm:ss'),
+        endTime : this.$moment(this.query.dateRange[1]).format('yyyy-MM-DD HH:mm:ss')
       }
       const {code,message,data} = await this.$api.workLoad.getAllWorkLoadByTime(search)
       this.setWorkLoadInfo(data)
@@ -109,12 +109,16 @@ export default {
         this.$message.error(message)
       }
     },
-    handleAdd(){
-
+    handleLoad(){
+        this.query.dateRange=[],
+        this.getAllWorkLoadInfo(this.query.pageIndex)
     },
     handlePageChange(val) {
       this.query.pageIndex = val
       this.getAllWorkLoadInfo(this.query.pageIndex);
+    },
+    handleExport(){
+
     }
   }
 };
@@ -131,29 +135,8 @@ export default {
   float: right;
 }
 
-.handle-select {
-  width: 120px;
-  margin-left: 20px;
-}
-
-.handle-input {
-  width: 300px;
-  display: inline-block;
-}
 .table {
   width: 100%;
   font-size: 14px;
-}
-.red {
-  color: #ff0000;
-}
-.mr10 {
-  margin-right: 10px;
-}
-.table-td-thumb {
-  display: block;
-  margin: auto;
-  width: 40px;
-  height: 40px;
 }
 </style>

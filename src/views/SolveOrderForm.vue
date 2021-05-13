@@ -119,7 +119,7 @@ export default {
         oId : this.form.oId,
         customerName:this.form.customerName,
         register:this.form.register,
-        solveTime:this.$moment(this.form.solveTime).format('yyyy-MM-DD HH:mm:ss'),
+        solveTime:this.$moment(this.form.solveTime).format('YYYY-MM-DD hh:mm:ss'),
         maintainer:str,
         status:this.form.status,
         reason:this.form.reason,

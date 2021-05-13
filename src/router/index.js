@@ -105,6 +105,15 @@ const routes = [
         component:()=> import(
             "../views/WorkLoad.vue")
       },
+      {
+        path: "/system",
+        name: "system",
+        meta: {
+          title: '系统用户设置',
+        },
+        component:()=> import(
+            "../views/System.vue")
+      },
     ]
   }, {
     path: "/login",
