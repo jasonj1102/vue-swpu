@@ -281,11 +281,20 @@ export default {
   created() {
     this.loadData()
   },
+  watch:{
+    "$route":"fetchSolveOrder"
+  },
   methods: {
     ...mapMutations('solveOrder',['setSolveOrderInfo']),
     ...mapActions('solveOrder',['getAllSolveOrderInfo']),
     ...mapActions('stu',['getStudent']),
     // 加载数据
+    fetchSolveOrder(){
+      if(this.$route.path ==='/solveOrder'){
+        console.log('跳转成功')
+        this.getAllSolveOrderInfo(this.query.pageIndex)
+      }
+    },
     async loadData () {
       this.getStudent()
       const{code,message,data} = await this.$api.solveOrder.getAllSolveOrder(this.query.pageIndex,this.query.pageSize)

@@ -28,10 +28,10 @@
             </template>
           </el-input>
         </el-form-item>
-        <el-form-item prop="verifycode">
+        <el-form-item prop="verifyCode">
           <div style="display: flex">
             <el-input
-              v-model="param.verifycode"
+              v-model="param.verifyCode"
               placeholder="请输入验证码"
             ></el-input>
             <span @click="refreshCode">
@@ -57,7 +57,7 @@ export default {
   components: { Identify },
   data() {
     // 验证码自定义验证规则
-    // const validateVerifycode = (rule, value, callback) => {
+    // const validateVerifyCode = (rule, value, callback) => {
     //   // 输入的验证码值
     //   const newVal = value.toLowerCase();
     //   // 生成的验证码值
@@ -65,7 +65,7 @@ export default {
     //   if (newVal === "") {
     //     callback(new Error("请输入验证码"));
     //   } else if (newVal !== identifyStr) {
-    //     console.log("validateVerifycode:", value);
+    //     console.log("validateVerifyCode:", value);
     //     callback(new Error("验证码不正确!"));
     //   } else {
     //     callback();
@@ -77,16 +77,16 @@ export default {
       param: {
         username: "",
         password: "",
-        verifycode: "",
+        verifyCode: "",
       },
       rules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
         ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        verifycode: [
-          // { required: true, trigger: "blur", validator: validateVerifycode },
-        ],
+        // verifyCode: [
+        //   { required: true, trigger: "blur", validator: validateVerifyCode },
+        // ],
       },
     };
   },

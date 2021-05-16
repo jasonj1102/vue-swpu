@@ -35,7 +35,9 @@
     <el-form-item label="处理结果">
       <!--  使用el中的开关控件和一个tag标签吧 -->
       <!--这里暂时没有写控件去控制状态，后面在order和solveOrder中会加上 -->
-      <el-input style="width: 100px" v-model="form.status"></el-input>
+        <!--这里使用:lable=“1”才是绑定的数字1-->
+        <el-radio v-model="form.status" :label="1">已解决</el-radio>
+        <el-radio v-model="form.status" :label="0">未解决</el-radio>
     </el-form-item>
     <el-form-item label="水晶头">
       <el-input class="c1" placeholder="水晶头个数" clearable  v-model="form.material.crystalHead"></el-input>

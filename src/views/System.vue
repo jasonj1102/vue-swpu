@@ -9,12 +9,10 @@
     </div>
     <div class="container">
       <div class="handle-left">
-        <el-button type="primary" icon="el-icon-circle-plus" @click="handleExport">导出</el-button>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
+        <el-button type="primary" icon="el-icon-user" round @click="registerUser">用户注册</el-button>
       </div>
       <div class="handle-right">
-        <el-button type="primary" icon="el-icon-circle-plus" @click="handleExport">导出</el-button>
-        <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
+        <el-button type="primary" icon="el-icon-s-custom" round >角色权限</el-button>
       </div>
       <el-table
           :data="tableData"
@@ -36,9 +34,16 @@
             <el-button
                 type="text"
                 icon="el-icon-mouse"
-                class="red"
+                :disabled="scope.row.role.rId === 3"
                 @click="handleEditUserRole(scope.$index, scope.row)"
             >分配角色</el-button>
+            <el-button
+                type="text"
+                icon="el-icon-delete"
+                class="red"
+                :disabled="scope.row.role.rId === 3"
+                @click="handleDeleteUser(scope.$index, scope.row)"
+            >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -53,6 +58,28 @@
         ></el-pagination>
       </div>
     </div>
+
+<!--    用户注册-->
+    <el-dialog title="用户注册" v-model="registerUserVisible" width="30%">
+      <el-form ref="updateForm" :model="updateForm" label-width="100px" label-position="right">
+        <el-form-item label="用户名">
+          <el-input v-model="updateForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="请输入密码">
+          <el-input v-model="updateForm.password" clearable type="password"></el-input>
+        </el-form-item>
+        <el-form-item label="请确认密码">
+          <el-input v-model="updateForm.confirmPassword" clearable type="password"></el-input>
+        </el-form-item>
+        <p class="login-tips" style="color: #8cc5ff">Tips : 用户默认角色为普通用户!!!</p>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+            <el-button @click="cancelRegisterUser">取 消</el-button>
+            <el-button type="primary" @click="saveRegisterUser">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
     <!--修改用户密码-->
     <el-dialog title="密码修改" v-model="editPasswordVisible" width="30%">
@@ -116,24 +143,15 @@ export default {
       },
       loading:true,
       editPasswordVisible:false,
-      editUserRoleVisible:false
+      editUserRoleVisible:false,
+      registerUserVisible:false
     }
   },
   computed:{
     ...mapState('systemUser',['systemUserInfo']),
     ...mapState('role',['roleInfo']),
     tableData(){
-      let systemUserArr =  this.systemUserInfo.list
-      for(let s= 0;s<systemUserArr.length;s++){
-        if(systemUserArr[s].role.roleName === 'user'){
-          systemUserArr[s].role.roleName = 'user(普通用户)'
-        }else if(systemUserArr[s].role.roleName ==='groupLeader'){
-          systemUserArr[s].role.roleName = 'groupLeader(组长)'
-        }else if(systemUserArr[s].role.roleName ==='root'){
-          systemUserArr[s].role.roleName = 'root(超级管理员)'
-        }
-      }
-      return systemUserArr
+      return this.systemUserInfo.list
     },
     total(){
       return this.systemUserInfo.total
@@ -192,8 +210,9 @@ export default {
       })
     },
     handleEditUserRole(index,row){
+      console.log(row)
       this.idx = index;
-      this.form = row;
+      this.form = row
       this.editUserRoleVisible = true;
     },
     cancelEditUserRole(){
@@ -210,6 +229,44 @@ export default {
       }else {
         this.$message.error(message)
       }
+    },
+    cancelRegisterUser(){
+      this.registerUserVisible = false
+    },
+    saveRegisterUser(){
+      this.$refs.updateForm.validate(async valid=>{
+        if (valid&&this.updateForm.password===this.updateForm.confirmPassword){
+          const {code,message} = await this.$api.user.register(this.updateForm.username,this.updateForm.confirmPassword);
+          this.registerUserVisible = false
+          if(code === 200){
+            this.$message.success(message)
+            await this.getAllSystemUserInfo(this.query.pageIndex)
+          }else {
+            this.$message.error(message)
+          }
+        }else {
+          this.$message.error("请重新确认密码...")
+        }
+      })
+    },
+    registerUser(){
+      this.registerUserVisible = true
+    },
+    handleDeleteUser(index){
+      this.$confirm("确定要删除吗？", "提示", {
+        type: "warning"
+      })
+        .then(async () => {
+          const {code,message} = await this.$api.user.deleteUser(this.systemUserInfo.list[index].uId)
+          if (code ===200){
+            this.tableData.splice(index, 1);
+            this.$message.success(message)
+            await this.getAllSystemUserInfo(this.query.pageIndex)
+          }else {
+            this.$message.error(message)
+          }
+
+        }).catch(() => {});
     }
   }
 };
@@ -223,7 +280,9 @@ export default {
 .el-input{
   width: 320px;
 }
-
+.red {
+  color: #ff0000;
+}
 .handle-right {
   margin-bottom: 20px;
   float: right;

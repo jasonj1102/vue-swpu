@@ -35,7 +35,10 @@
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="toolNumber" label="工具编号" align="center"></el-table-column>
         <el-table-column prop="toolName" label="工具名称" align="center"></el-table-column>
-        <el-table-column prop="url" label="图片详情" align="center"></el-table-column>
+<!--        <el-table-column prop="url" label="图片详情" align="center"></el-table-column>-->
+        <el-table-column align="center" label="图片详情">
+          <img src="../assets/img/wxq.png" class="user-avator" alt />
+        </el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
             <el-button

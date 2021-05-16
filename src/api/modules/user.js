@@ -13,19 +13,15 @@ function login(user){
 /**
  * 用户注册，只能超级管理员才能注册用户信息
  */
-function register(user){
+function register(username,password){
   return http.post('/api/user/register',{
-    username: user.username,
-    password: user.password
+    username: username,
+    password: password
   })
 }
 
-function getUserInfoByUsername(username){
-  return http.get(`/api/user/getUserInfo`,{
-    params: {
-      username : username
-    }
-  })
+function deleteUser(uId){
+  return http.post(`/api/user/delete/${uId}`)
 }
 
 /**
@@ -45,5 +41,5 @@ export default{
   login,
   register,
   updatePassword,
-  getUserInfoByUsername
+  deleteUser
 }
