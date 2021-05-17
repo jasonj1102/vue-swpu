@@ -1,23 +1,24 @@
 <template>
-  <el-table
-      :data="tableData"
-      border
-      v-loading="loading"
-      style="width: 100%">
-    <el-table-column
-        prop="stuName"
-        label="学生姓名"
-        width="180" align="center">
-    </el-table-column>
-    <el-table-column
-        prop="totalMoney"
-        label="总奖惩"
-        width="180" align="center">
-    </el-table-column>
-  </el-table>
+  <div class="totalMoney">
+    <el-table
+        :data="tableData"
+        border
+        v-loading="loading"
+        style="width: 100%">
+      <el-table-column
+          prop="stuName"
+          label="学生姓名"
+          width="180" align="center">
+      </el-table-column>
+      <el-table-column
+          prop="totalMoney"
+          label="总奖惩"
+          width="180" align="center">
+      </el-table-column>
+    </el-table>
+    <el-button type="success" plain @click="exportToExcel">导出>></el-button>
+  </div>
 </template>
-
-
 
 <script>
 import {mapState,mapMutations,mapActions} from 'vuex'
@@ -49,6 +50,14 @@ name:'reward',
         this.setRewardInfo(data)
         this.$message.success(message)
       }else if(code === 201){
+        this.$message.error(message)
+      }
+    },
+    async exportToExcel(){
+      const {code,message} = await this.$api.fine.downLoad(this.rewardInfo)
+      if (code === 200){
+        this.$message.success(message)
+      }else {
         this.$message.error(message)
       }
     }

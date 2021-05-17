@@ -20,7 +20,7 @@
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <div class="handle-right">
-        <el-button type="primary" icon="el-icon-circle-plus" @click="handleExport">导出</el-button>
+        <el-button type="primary" icon="el-icon-download" @click="handleExport">导出</el-button>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
       </div>
       <el-table
@@ -117,8 +117,14 @@ export default {
       this.query.pageIndex = val
       this.getAllWorkLoadInfo(this.query.pageIndex);
     },
-    handleExport(){
-
+    async handleExport(){
+      let startTime = this.$moment(this.query.dateRange[0]).format('yyyy-MM-DD HH:mm:ss')
+      const {code,message} = await this.$api.workLoad.downLoad(this.workLoadInfo.list,startTime)
+      if (code === 200){
+        this.$message.success(message)
+      }else {
+        this.$message.error(message)
+      }
     }
   }
 };

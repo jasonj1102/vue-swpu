@@ -280,7 +280,7 @@ export default {
         sendTime : this.$moment(this.addForm.sendTime).format('yyyy-MM-DD HH:mm:ss'),
         dispatcher : this.addForm.dispatcher,
         description : this.addForm.description,
-        appointmentTime : this.$moment(this.addForm.appointmentTime).format('YYYY-MM-DD hh:mm:ss'),
+        appointmentTime : this.$moment(this.addForm.appointmentTime).format('YYYY-MM-DD HH:mm:ss'),
       }
       console.log(order)
       const{code,message,data} = await this.$api.order.insertOrder(order)
@@ -383,10 +383,10 @@ export default {
         category : this.form.category,
         address : this.form.address,
         number : this.form.number,
-        sendTime : this.$moment(this.form.sendTime).format('YYYY-MM-DD hh:mm:ss'),
+        sendTime : this.$moment(this.form.sendTime).format('YYYY-MM-DD HH:mm:ss'),
         dispatcher : this.form.dispatcher,
         description: this.form.description,
-        appointmentTime : this.$moment(this.form.appointmentTime).format('YYYY-MM-DD hh:mm:ss')
+        appointmentTime : this.$moment(this.form.appointmentTime).format('YYYY-MM-DD HH:mm:ss')
       }
       console.log(order)
       const {code,message} =  await this.$api.order.updateOrder(order)

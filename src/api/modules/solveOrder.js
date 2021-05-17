@@ -33,7 +33,9 @@ function searchSolveOrder(search){
   return http.post(`/api/solveOrder/search`,{
     page : search.page,
     size : search.size,
-    sId : search.sId
+    sId : search.sId,
+    startTime : search.startTime,
+    endTime : search.endTime
   })
 }
 
@@ -43,11 +45,21 @@ function deleteSolveOrderByIds(soIds){
   })
 }
 
+function downLoad(solveOrderInfo,startTime){
+  return http.post(`/api/solveOrder/downLoad`,
+      {
+        solveOrderInfo : JSON.stringify(solveOrderInfo),
+        startTime : startTime
+      }
+  )
+}
+
 export default {
   getAllSolveOrder,
   insertSolveOrder,
   updateSolveOrder,
   searchSolveOrder,
   deleteSolveOrder,
-  deleteSolveOrderByIds
+  deleteSolveOrderByIds,
+  downLoad
 }

@@ -19,9 +19,19 @@ function getAllWorkLoadByTime(search){
   })
 }
 
+function downLoad(workLoadInfo,startTime){
+  return http.post(`/api/workLoad/downLoad`,
+      {
+        workLoadInfo : JSON.stringify(workLoadInfo),
+        startTime : startTime
+      }
+  )
+}
+
 
 
 export default {
   getAllWorkLoad,
-  getAllWorkLoadByTime
+  getAllWorkLoadByTime,
+  downLoad
 }

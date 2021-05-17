@@ -56,6 +56,14 @@ function getAllStuReward(){
   return http.get(`/api/fine/getAllStuReward`)
 }
 
+function downLoad(rewardInfo){
+  return http.post(`/api/fine/downLoad`,
+      {
+        rewardInfo : JSON.stringify(rewardInfo)
+      }
+  )
+}
+
 
 export default {
   getAllFine,
@@ -64,5 +72,6 @@ export default {
   updateFine,
   deleteFineByIds,
   searchFine,
-  getAllStuReward
+  getAllStuReward,
+  downLoad
 }

@@ -24,11 +24,20 @@
               :value="item.sId">
           </el-option>
         </el-select>
+        <el-date-picker
+            v-model="query.dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            style="margin-right:10px">
+        </el-date-picker>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <div class="handle-right">
         <el-button type="primary" icon="el-icon-circle-plus" @click="handleAdd">登单</el-button>
         <el-button type="primary" icon="el-icon-refresh-right" @click="handleLoad">加载全部</el-button>
+        <el-button type="primary" icon="el-icon-download" @click="handleDownLoad">导出</el-button>
       </div>
       <el-table
           :data="tableData"
@@ -195,7 +204,8 @@
         <el-form-item label="处理结果">
           <!--  使用el中的开关控件和一个tag标签吧 -->
           <!--这里暂时没有写控件去控制状态，后面在order和solveOrder中会加上 -->
-          <el-input v-model="form.status"></el-input>
+          <el-radio v-model="form.status" :label="1">已解决</el-radio>
+          <el-radio v-model="form.status" :label="0">未解决</el-radio>
         </el-form-item>
         <el-form-item label="水晶头">
           <el-input v-model="form.material.crystalHead"></el-input>
@@ -237,7 +247,8 @@ export default {
         sId:null,
         stuName: '',
         pageIndex:1,
-        pageSize:10
+        pageSize:10,
+        dateRange:[]
       },
       checkAll:false,
       isIndeterminate: false,
@@ -261,8 +272,8 @@ export default {
       for(let j =0;j<solveOrderArr.length;j++){
         let str = ""
         let stuArr = solveOrderArr[j].maintainers
-        let startTime =  this.$moment(solveOrderArr[j].order.sendTime).format('YYYY-MM-DD hh:mm:ss')
-        let endTime = this.$moment(solveOrderArr[j].solveTime).format('YYYY-MM-DD hh:mm:ss')
+        let startTime =  this.$moment(solveOrderArr[j].order.sendTime).format('YYYY-MM-DD HH:mm:ss')
+        let endTime = this.$moment(solveOrderArr[j].solveTime).format('YYYY-MM-DD HH:mm:ss')
         for (let i = 0; i<stuArr.length;i++){
           str += (i === stuArr.length-1?stuArr[i].stuName:stuArr[i].stuName+' ')
         }
@@ -310,6 +321,7 @@ export default {
     },
     //加载全部
     handleLoad(){
+      this.query.dateRange = []
       this.query.sId = null,
       this.getAllSolveOrderInfo(this.query.pageIndex)
     },
@@ -353,7 +365,9 @@ export default {
       let search = {
         page : this.query.pageIndex,
         size : this.query.pageSize,
-        sId : this.query.sId
+        sId : this.query.sId,
+        startTime : this.$moment(this.query.dateRange[0]).format('YYYY-MM-DD HH:mm:ss'),
+        endTime : this.$moment(this.query.dateRange[1]).format('YYYY-MM-DD HH:mm:ss')
       }
       const {code,message,data} = await this.$api.solveOrder.searchSolveOrder(search)
       this.setSolveOrderInfo(data)
@@ -453,7 +467,7 @@ export default {
         solveId : this.solveOrderInfo.list[this.idx].solveId,
         customerName : this.form.customerName,
         register : this.form.register,
-        solveTime : this.$moment(this.form.solveTime).format('YYYY-MM-DD hh:mm:ss'),
+        solveTime : this.$moment(this.form.solveTime).format('YYYY-MM-DD HH:mm:ss'),
         maintainer : str,
         material:{
           ...material
@@ -474,6 +488,7 @@ export default {
     },
     // 分页导航
     handlePageChange(val) {
+      console.log(val)
       this.query.pageIndex = val
       this.getAllSolveOrderInfo(this.query.pageIndex);
     },
@@ -507,6 +522,15 @@ export default {
       let leave3=leave2%(60*1000)      //计算分钟数后剩余的毫秒数
       let seconds=Math.round(leave3/1000)
       return dayDiff+"天"+hours+"时"+minutes+"分"+seconds+"秒"
+    },
+    async handleDownLoad(){
+      let startTime = this.$moment(this.query.dateRange[0]).format('yyyy-MM-DD HH:mm:ss')
+      const {code,message} = await this.$api.solveOrder.downLoad(this.solveOrderInfo.list,startTime)
+      if (code === 200){
+        this.$message.success(message)
+      }else {
+        this.$message.error(message)
+      }
     }
   }
 };
